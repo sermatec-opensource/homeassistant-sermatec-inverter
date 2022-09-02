@@ -1,0 +1,1 @@
+DOMAIN = "sermatec_inverter"
