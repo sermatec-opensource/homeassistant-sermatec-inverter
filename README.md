@@ -20,5 +20,8 @@ Notes:
 ### Supported devices
 Only tested device is the `Sermatec SMT-10K-TL-TH`. However, probably all residential hybrid inverters by Sermatec should work.
 
+### Communication script
+Inverter communication script is in development in [this repository](https://github.com/andreondra/sermatec-inverter), which includes also a detailed documentation.
+
 ## Disclaimer
 Because the protocol used for local communication is reverse-engineered (due to the lack of the official documentation,) I am not responsible for any damage that this integration could cause to your inverter or to your house wiring / electrical equipment.
