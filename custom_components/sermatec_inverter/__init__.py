@@ -1,47 +1,43 @@
-"Sermatec Inverter integration."
+"""The Sermatec Inverter integration."""
 from __future__ import annotations
 
+import logging
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import (
-    ConfigType
-)
-from sermatec_inverter import Sermatec
 
-from . import hub
 from .const import DOMAIN
 
+from sermatec_inverter import Sermatec
+
+PLATFORMS: list[Platform] = [Platform.SENSOR]
 _LOGGER = logging.getLogger(__name__)
 
-# List of platforms to support. There should be a matching .py file for each,
-# eg <cover.py> and <sensor.py>
-PLATFORMS: list[str] = ["cover", "sensor"]
+async def async_setup(hass: HomeAssistant, config: dict):
+    # Ensure our name space for storing objects is a known type. A dict is
+    # common/preferred as it allows a separate instance of your class for each
+    # instance that has been created in the UI.
+    hass.data.setdefault(DOMAIN, {})
 
+    return True
 
-async def async_setup_entry(
-    hass: HomeAssistant,
-    entry: ConfigEntry,
-    config: ConfigType
-    ) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Set up sermatec from a config entry."""
     
-    """Set up Sermatec Inverter from a config entry."""
-    # Store an instance of the "connecting" class that does the work of speaking
-    # with your actual devices.
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = Sermatec(_LOGGER, config[CONF_IP_ADDRESS], config[CONF_PORT])
-
-    # This creates each HA object for each platform your device requires.
-    # It's done by calling the `async_setup_entry` function in each platform module.
+    hass.data[DOMAIN][entry.entry_id] = Sermatec(
+        _LOGGER,
+        entry.data['host'],
+        entry.data['port']
+    )
+    
     hass.config_entries.async_setup_platforms(entry, PLATFORMS)
+
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    # This is called when an entry/configured device is to be removed. The class
-    # needs to unload itself, and remove callbacks. See the classes for further
-    # details
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    if unload_ok:
+    if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         hass.data[DOMAIN].pop(entry.entry_id)
 
-    return 
+    return unload_ok

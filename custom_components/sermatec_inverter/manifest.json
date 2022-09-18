@@ -1,6 +1,6 @@
 {
   "codeowners": ["@andreondra"],
-  "config_flow": false,
+  "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/andreondra/homeassistant-sermatec-inverter",
   "domain": "sermatec_inverter",

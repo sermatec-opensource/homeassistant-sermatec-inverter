@@ -4,10 +4,13 @@ from datetime import timedelta
 import logging
 from typing import Any, Callable, Dict, Optional
 from homeassistant.components import integration
+from homeassistant.config_entries import ConfigEntry
 
 import voluptuous as vol
 
 from homeassistant.core import HomeAssistant, callback
+
+from .const import DOMAIN
 
 # from .sermatec import Sermatec
 from sermatec_inverter import Sermatec
@@ -40,17 +43,16 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     }
 )
 
-async def async_setup_platform(
-    hass: HomeAssistantType,
-    config: ConfigType,
-    async_add_entities: Callable,
-    discovery_info: Optional[DiscoveryInfoType] = None,
+async def async_setup_entry(
+    hass : HomeAssistant,
+    config_entry : ConfigEntry,
+    async_add_entities : Callable
 ) -> None:
-    """Set up the sensor platform."""
-
-    smc_api     = Sermatec(_LOGGER, config[CONF_IP_ADDRESS], config[CONF_PORT])
+    """Set up sensor entry."""
+    
+    smc_api = hass.data[DOMAIN][config_entry.entry_id]
     coordinator = SermatecCoordinator(hass, smc_api)
-
+    
     await coordinator.async_config_entry_first_refresh()
     serial_number = "Sermatec"#coordinator.data["serial"]
 
@@ -381,6 +383,7 @@ async def async_setup_platform(
 
     async_add_entities(sensors, True)
 
+   
 class SermatecCoordinator(DataUpdateCoordinator):
     """Inverter data coordinator."""
 
@@ -467,6 +470,10 @@ class SermatecSensor(CoordinatorEntity, SensorEntity):
         """Handle data from the coordinator."""
         self._attr_native_value = self.coordinator.data[self.dict_key]
         self.async_write_ha_state()
+
+    @property
+    def unique_id(self) -> str | None:
+        return self._attr_unique_id
 
     @property
     def device_info(self):
