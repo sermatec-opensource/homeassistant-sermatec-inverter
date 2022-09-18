@@ -9,7 +9,8 @@ import voluptuous as vol
 
 from homeassistant.core import HomeAssistant, callback
 
-from .sermatec import Sermatec
+# from .sermatec import Sermatec
+from sermatec_inverter import Sermatec
 
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
