@@ -278,6 +278,86 @@ async def async_setup_platform(
         SermatecSensor(
             coordinator     = coordinator,
             serial_number   = serial_number,
+            dict_key        = "backup_frequency",
+            name            = "Backup frequency",
+            device_class    = "frequency",
+            unit            = "Hz" 
+        ),
+        SermatecSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key        = "backup_active_power",
+            name            = "Backup active power",
+            device_class    = "power",
+            unit            = "W" 
+        ),
+        SermatecSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key        = "backup_reactive_power",
+            name            = "Backup reactive power",
+            device_class    = "reactive_power",
+            unit            = "var" 
+        ),
+        SermatecSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key        = "backup_apparent_power",
+            name            = "Backup apparent power",
+            device_class    = "apparent_power",
+            unit            = "VA" 
+        ),
+        SermatecSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key        = "backup_a_phase_voltage",
+            name            = "Backup A phase voltage",
+            device_class    = "voltage",
+            unit            = "V" 
+        ),
+        SermatecSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key        = "backup_b_phase_voltage",
+            name            = "Backup B phase voltage",
+            device_class    = "voltage",
+            unit            = "V" 
+        ),
+        SermatecSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key        = "backup_c_phase_voltage",
+            name            = "Backup C phase voltage",
+            device_class    = "voltage",
+            unit            = "V" 
+        ),
+        SermatecSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key        = "backup_a_phase_current",
+            name            = "Backup A phase current",
+            device_class    = "current",
+            unit            = "A" 
+        ),
+        SermatecSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key        = "backup_b_phase_current",
+            name            = "Backup B phase current",
+            device_class    = "current",
+            unit            = "A" 
+        ),
+        SermatecSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key        = "backup_c_phase_current",
+            name            = "Backup C phase current",
+            device_class    = "current",
+            unit            = "A" 
+        ),
+        SermatecSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
             dict_key        = "upper_limit_ongrid_power",
             name            = "Upper limit of on-grid power",
             device_class    = "power",
