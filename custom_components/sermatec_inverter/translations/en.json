@@ -12,7 +12,7 @@
             "user": {
                 "data": {
                     "host": "Host",
-                    "port": "Port"
+                    "port": "Port (default 8899)"
                 }
             }
         }

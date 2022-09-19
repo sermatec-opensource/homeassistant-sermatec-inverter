@@ -1,20 +1,15 @@
+""""Sermatec sensor platform."""
+
+# Generic modules.
 import asyncio
-from configparser import InterpolationDepthError
 from datetime import timedelta
 import logging
-from typing import Any, Callable, Dict, Optional
-from homeassistant.components import integration
-from homeassistant.config_entries import ConfigEntry
-
 import voluptuous as vol
+from typing import Callable
 
+# Hass modules.
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
-
-from .const import DOMAIN
-
-# from .sermatec import Sermatec
-from sermatec_inverter import Sermatec
-
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
@@ -22,20 +17,20 @@ from homeassistant.helpers.update_coordinator import (
 )
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.entity import Entity
-from homeassistant.helpers.typing import (
-    ConfigType,
-    DiscoveryInfoType,
-    HomeAssistantType
-)
-
 from homeassistant.const import (
     CONF_IP_ADDRESS,
     CONF_PORT
 )
 
+# API module.
+from sermatec_inverter import Sermatec
+
+# Constants.
+from .const import DOMAIN
+
 _LOGGER = logging.getLogger(__name__)
 
+# Configuration schema.
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
         vol.Required(CONF_IP_ADDRESS): cv.string,
@@ -43,25 +38,23 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     }
 )
 
+# Set up the sensor platform from a config entry.
 async def async_setup_entry(
-    hass : HomeAssistant,
-    config_entry : ConfigEntry,
-    async_add_entities : Callable
+    hass                : HomeAssistant,
+    config_entry        : ConfigEntry,
+    async_add_entities  : Callable
 ) -> None:
-    """Set up sensor entry."""
     
     smc_api = hass.data[DOMAIN][config_entry.entry_id]
     coordinator = SermatecCoordinator(hass, smc_api)
     
-    await coordinator.async_config_entry_first_refresh()
-    serial_number = "Sermatec"#coordinator.data["serial"]
+    # await coordinator.async_config_entry_first_refresh()
+    serial_number = config_entry.data["serial"]
 
     sensors = [
-        SermatecSensor(
+        SermatecSerialSensor(
             coordinator     = coordinator,
             serial_number   = serial_number,
-            dict_key        = "serial",
-            name            = "Inverter serial ID",
         ),
         SermatecSensor(
             coordinator     = coordinator,
@@ -449,6 +442,25 @@ class SermatecCoordinator(DataUpdateCoordinator):
             **wpams
         }
 
+class SermatecSerialSensor(CoordinatorEntity, SensorEntity):
+    """Special Sermatec sensor for storing serial as a main feature of the device."""
+    
+    def __init__(self, coordinator, serial_number):
+        super().__init__(coordinator)
+        self._attr_native_value = serial_number
+        self._attr_unique_id = serial_number + "serial"
+        self._attr_name = "Sermatec Solar Inverter"
+        self._attr_icon = "mdi:solar-power"
+        # Main feature of a device, so the value shall be False.
+        self._attr_has_entity_name = False
+        self._attr_device_info = {
+            "identifiers":{
+                ("Sermatec", serial_number)
+            },
+            "name": "Solar Inverter",
+            "manufacturer": "Sermatec",
+            "model": "Residential Hybrid Inverter 5-10 kW"
+        }
 
 class SermatecSensor(CoordinatorEntity, SensorEntity):
     """Sermatec Inverter sensor."""
@@ -483,4 +495,5 @@ class SermatecSensor(CoordinatorEntity, SensorEntity):
             },
             "name": "Solar Inverter",
             "manufacturer": "Sermatec",
+            "model": "Residential Hybrid Inverter 5-10 kW"
         }

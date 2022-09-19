@@ -13,17 +13,19 @@ from sermatec_inverter import Sermatec
 PLATFORMS: list[Platform] = [Platform.SENSOR]
 _LOGGER = logging.getLogger(__name__)
 
+# Name space preparation.
 async def async_setup(hass: HomeAssistant, config: dict):
-    # Ensure our name space for storing objects is a known type. A dict is
-    # common/preferred as it allows a separate instance of your class for each
+    # A dict is common/preferred as it allows a separate instance of the class for each
     # instance that has been created in the UI.
     hass.data.setdefault(DOMAIN, {})
 
     return True
 
+# Prepare API and set up platforms.
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up sermatec from a config entry."""
     
+    # Storing an API to use by platforms.
     hass.data[DOMAIN][entry.entry_id] = Sermatec(
         _LOGGER,
         entry.data['host'],
@@ -34,7 +36,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     return True
 
-
+# Unload integration instance
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
