@@ -4,14 +4,9 @@
 ### Manual
 1. Download integration.
 2. Copy the folder `custom_components/sermatec_inverter` to your config directory.
-3. Add a config to your configuration.yaml:
-```
-sensor:
-  - platform: sermatec_inverter
-    ip_address: "inverter_ip"
-    port: api_port
-```
-4. Restart Home Assistant.
+3. Restart Home Assistant.
+4. In Home Assistant, go to Settings -> Devices & Services -> `+ ADD INTEGRATION` -> search for Sermatec Inverter -> fill in host and port -> click submit.
+5. Done! Now you can see all the sensors in Integrations under Sermatec Inverter.
 
 Notes:
 - IP is probably assigned dynamically by your router's DHCP server. I recommend setting a static IP (available on most routers), otherwise you would probably need to change the IP in the config once in a while.
