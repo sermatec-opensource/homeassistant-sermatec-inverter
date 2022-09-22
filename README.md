@@ -1,5 +1,7 @@
 # Sermatec Inverter for Home Assistant
 
+![Home Assistant screenshot](assets/hass_integration.png)
+
 ## Installation
 ### Manual
 1. Download integration.
