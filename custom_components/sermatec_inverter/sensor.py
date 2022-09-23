@@ -372,6 +372,42 @@ async def async_setup_entry(
             device_class    = "battery",
             unit            = "%"
         ),
+        SermatecPositiveSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key        = "grid_active_power",
+            name            = "Grid export",
+            id              = "grid_export",
+            device_class    = "power",
+            unit            = "W"
+        ),
+        SermatecNegativeSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key        = "grid_active_power",
+            name            = "Grid import",
+            id              = "grid_import",
+            device_class    = "power",
+            unit            = "W"
+        ),
+        SermatecPositivePowerSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key        = {"voltage":"battery_voltage", "current":"battery_current"},
+            name            = "Battery charging power",
+            id              = "battery_charging_power",
+            device_class    = "power",
+            unit            = "W"
+        ),
+        SermatecNegativePowerSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key        = {"voltage":"battery_voltage", "current":"battery_current"},
+            name            = "Battery discharging power",
+            id              = "battery_discharging_power",
+            device_class    = "power",
+            unit            = "W"
+        )
     ]
 
     async_add_entities(sensors, True)
@@ -442,47 +478,22 @@ class SermatecCoordinator(DataUpdateCoordinator):
             **wpams
         }
 
-class SermatecSerialSensor(CoordinatorEntity, SensorEntity):
-    """Special Sermatec sensor for storing serial as a main feature of the device."""
+class SermatecSensorBase(CoordinatorEntity, SensorEntity):
+    """Standard Sermatec Inverter sensor."""
     
-    def __init__(self, coordinator, serial_number):
-        super().__init__(coordinator)
-        self._attr_native_value = serial_number
-        self._attr_unique_id = serial_number + "serial"
-        self._attr_name = "Sermatec Solar Inverter"
-        self._attr_icon = "mdi:solar-power"
-        # Main feature of a device, so the value shall be False.
-        self._attr_has_entity_name = False
-        self._attr_device_info = {
-            "identifiers":{
-                ("Sermatec", serial_number)
-            },
-            "name": "Solar Inverter",
-            "manufacturer": "Sermatec",
-            "model": "Residential Hybrid Inverter 5-10 kW"
-        }
-
-class SermatecSensor(CoordinatorEntity, SensorEntity):
-    """Sermatec Inverter sensor."""
-    
-    def __init__(self, coordinator, serial_number, dict_key, name, device_class = None, unit = None):
+    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
+        
         super().__init__(coordinator)
         # Dict item key.
-        self.dict_key    = dict_key
-        self.serial_number = serial_number
-        self._attr_unique_id = serial_number + dict_key
-        self._attr_native_unit_of_measurement = unit
+        self.dict_key                           = dict_key
+        self.serial_number                      = serial_number
+        self._attr_unique_id                    = serial_number + (id if id else dict_key)
+        self._attr_native_unit_of_measurement   = unit
         # Not the main feature of a device = True.
-        self._attr_has_entity_name = True
-        self._attr_name = name
-        self._attr_device_class = device_class
+        self._attr_has_entity_name              = True
+        self._attr_name                         = name
+        self._attr_device_class                 = device_class
     
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle data from the coordinator."""
-        self._attr_native_value = self.coordinator.data[self.dict_key]
-        self.async_write_ha_state()
-
     @property
     def unique_id(self) -> str | None:
         return self._attr_unique_id
@@ -497,3 +508,87 @@ class SermatecSensor(CoordinatorEntity, SensorEntity):
             "manufacturer": "Sermatec",
             "model": "Residential Hybrid Inverter 5-10 kW"
         }
+
+class SermatecSensor(SermatecSensorBase):
+
+    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
+        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle data from the coordinator."""
+        self._attr_native_value = self.coordinator.data[self.dict_key]
+        self.async_write_ha_state()
+
+class SermatecSerialSensor(SermatecSensorBase):
+    """Special Sermatec sensor for storing serial as a main feature of the device."""
+    
+    def __init__(self, coordinator, serial_number):
+
+        super().__init__(coordinator, serial_number, None, "Sermatec Solar Inverter", serial_number + "serial", None, None)
+        self._attr_native_value = serial_number
+        self._attr_icon = "mdi:solar-power"
+        # Main feature of a device, so the value shall be False.
+        self._attr_has_entity_name = False
+
+class SermatecPositiveSensor(SermatecSensorBase):
+    """
+    Special Sermatec sensor for tracking only positive values.
+    """
+    
+    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
+        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
+    
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle data from the coordinator."""
+        data : int = int(self.coordinator.data[self.dict_key])
+        self._attr_native_value = abs(data) if data > 0 else 0
+        self.async_write_ha_state()
+
+class SermatecNegativeSensor(SermatecSensor):
+    """
+    Special Sermatec sensor for tracking only negative values.
+    """
+
+    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
+        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle data from the coordinator."""
+        data : int = int(self.coordinator.data[self.dict_key])
+        self._attr_native_value = abs(data) if data < 0 else 0
+        self.async_write_ha_state()
+
+class SermatecPositivePowerSensor(SermatecSensor):
+    """
+    Special Sermatec sensor for calculating power from voltage
+    and current and tracking only positive value.
+    """
+
+    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
+        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle data from the coordinator."""
+        data : int = int(self.coordinator.data[self.dict_key["voltage"]]) * int(self.coordinator.data[self.dict_key["current"]])
+        self._attr_native_value = abs(data) if data > 0 else 0
+        self.async_write_ha_state()
+
+class SermatecNegativePowerSensor(SermatecSensor):
+    """
+    Special Sermatec sensor for calculating power from voltage
+    and current and tracking only positive value.
+    """
+
+    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
+        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle data from the coordinator."""
+        data : int = int(self.coordinator.data[self.dict_key["voltage"]]) * int(self.coordinator.data[self.dict_key["current"]])
+        self._attr_native_value = abs(data) if data < 0 else 0
+        self.async_write_ha_state()
