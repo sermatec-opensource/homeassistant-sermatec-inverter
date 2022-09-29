@@ -493,10 +493,6 @@ class SermatecSensorBase(CoordinatorEntity, SensorEntity):
         self._attr_has_entity_name              = True
         self._attr_name                         = name
         self._attr_device_class                 = device_class
-    
-    @property
-    def unique_id(self) -> str | None:
-        return self._attr_unique_id
 
     @property
     def device_info(self):
