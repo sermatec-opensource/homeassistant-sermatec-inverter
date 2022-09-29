@@ -407,6 +407,15 @@ async def async_setup_entry(
             id              = "battery_discharging_power",
             device_class    = "power",
             unit            = "W"
+        ),
+        SermatecPVTotalPowerSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key        = {"pv1":"pv1_power", "pv2":"pv2_power"},
+            name            = "PV total power",
+            id              = "pv_total_power",
+            device_class    = "power",
+            unit            = "W"  
         )
     ]
 
@@ -587,4 +596,18 @@ class SermatecNegativePowerSensor(SermatecSensor):
         """Handle data from the coordinator."""
         data : int = int(self.coordinator.data[self.dict_key["voltage"]]) * int(self.coordinator.data[self.dict_key["current"]])
         self._attr_native_value = abs(data) if data < 0 else 0
+        self.async_write_ha_state()
+
+class SermatecPVTotalPowerSensor(SermatecSensor):
+    """
+    Special Sermatec sensor for calculating total PV power.
+    """
+
+    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
+        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle data from the coordinator."""
+        self._attr_native_value = int(self.coordinator.data[self.dict_key["pv1"]]) + int(self.coordinator.data[self.dict_key["pv2"]])
         self.async_write_ha_state()
