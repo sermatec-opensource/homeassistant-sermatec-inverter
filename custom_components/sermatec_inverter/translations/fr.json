@@ -1,0 +1,20 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Appareil déjà configuré"
+        },
+        "error": {
+            "cannot_connect": "Echec de connection",
+            "invalid_auth": "Authentification invalide",
+            "unknown": "Erreur inattendue"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "host": "Nom d'hôte",
+                    "port": "Port (défaut 8899)"
+                }
+            }
+        }
+    }
+}
