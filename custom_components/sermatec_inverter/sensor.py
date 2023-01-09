@@ -394,8 +394,8 @@ async def async_setup_entry(
             coordinator     = coordinator,
             serial_number   = serial_number,
             dict_key        = {"voltage":"battery_voltage", "current":"battery_current"},
-            name            = "Battery charging power",
-            id              = "battery_charging_power",
+            name            = "Battery discharging power",
+            id              = "battery_discharging_power",
             device_class    = "power",
             unit            = "W"
         ),
@@ -403,8 +403,8 @@ async def async_setup_entry(
             coordinator     = coordinator,
             serial_number   = serial_number,
             dict_key        = {"voltage":"battery_voltage", "current":"battery_current"},
-            name            = "Battery discharging power",
-            id              = "battery_discharging_power",
+            name            = "Battery charging power",
+            id              = "battery_charging_power",
             device_class    = "power",
             unit            = "W"
         ),
