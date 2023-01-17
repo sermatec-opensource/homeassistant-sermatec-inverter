@@ -94,7 +94,7 @@ async def async_setup_entry(
             dict_key        = "battery_temperature",
             name            = "Battery temperature",
             device_class    = "temperature",
-            unit            = "˚C"
+            unit            = "°C"
         ),
         SermatecSensor(
             coordinator     = coordinator,
