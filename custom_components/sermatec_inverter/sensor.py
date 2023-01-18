@@ -390,19 +390,19 @@ async def async_setup_entry(
             device_class    = "power",
             unit            = "W"
         ),
-        SermatecBatteryPowerSensor(
+        SermatecBatteryDisChargingPowerSensor(
             coordinator     = coordinator,
             serial_number   = serial_number,
-            dict_key        = {"voltage":"battery_voltage", "current":"battery_current", "battery_state":"discharging"},
+            dict_key        = {"voltage":"battery_voltage", "current":"battery_current"},
             name            = "Battery discharging power",
             id              = "battery_discharging_power",
             device_class    = "power",
             unit            = "W"
         ),
-        SermatecBatteryPowerSensor(
+        SermatecBatteryChargingPowerSensor(
             coordinator     = coordinator,
             serial_number   = serial_number,
-            dict_key        = {"voltage":"battery_voltage", "current":"battery_current", "battery_state":"charging"},
+            dict_key        = {"voltage":"battery_voltage", "current":"battery_current"},
             name            = "Battery charging power",
             id              = "battery_charging_power",
             device_class    = "power",
@@ -597,10 +597,12 @@ class SermatecNegativePowerSensor(SermatecSensor):
         self._attr_native_value = abs(data) if data < 0 else 0
         self.async_write_ha_state()
 
-class SermatecBatteryPowerSensor(SermatecSensor):
+class SermatecBatteryChargingPowerSensor(SermatecSensor):
     """
-    Special Sermatec sensor for battery charging / discharging power from current and voltage,
-    if actual battery state is different from the provided battery_state, else return 0
+    Special Sermatec sensor for battery charging power from current and voltage,
+    if actual battery_state is different "charging" return 0
+    value should always be negative for charging
+    ref: https://community.home-assistant.io/t/howto-fronius-integration-with-battery-into-energy-dashboard/376329
     """
 
     def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
@@ -609,7 +611,25 @@ class SermatecBatteryPowerSensor(SermatecSensor):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        data: int = int(self.coordinator.data[self.dict_key["voltage"]]) * int(self.coordinator.data[self.dict_key["current"]]) if self.coordinator.data["battery_state"] == self.dict_key["battery_state"] else 0
+        data: int = int(self.coordinator.data[self.dict_key["voltage"]]) * int(self.coordinator.data[self.dict_key["current"]]) if self.coordinator.data["battery_state"] == "charging" else 0
+        self._attr_native_value = 0 - abs(data)
+        self.async_write_ha_state()
+
+class SermatecBatteryDisChargingPowerSensor(SermatecSensor):
+    """
+    Special Sermatec sensor for battery discharging power from current and voltage,
+    if actual battery_state is different "discharging" return 0
+    value should always be positive for discharging
+    ref: https://community.home-assistant.io/t/howto-fronius-integration-with-battery-into-energy-dashboard/376329
+    """
+
+    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
+        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle data from the coordinator."""
+        data: int = int(self.coordinator.data[self.dict_key["voltage"]]) * int(self.coordinator.data[self.dict_key["current"]]) if self.coordinator.data["battery_state"] == "discharging" else 0
         self._attr_native_value = abs(data)
         self.async_write_ha_state()
 
