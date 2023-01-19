@@ -390,7 +390,7 @@ async def async_setup_entry(
             device_class    = "power",
             unit            = "W"
         ),
-        SermatecBatteryDisChargingPowerSensor(
+        SermatecBatteryDischargingPowerSensor(
             coordinator     = coordinator,
             serial_number   = serial_number,
             dict_key        = {"voltage":"battery_voltage", "current":"battery_current"},
@@ -612,10 +612,10 @@ class SermatecBatteryChargingPowerSensor(SermatecSensor):
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
         data: int = int(self.coordinator.data[self.dict_key["voltage"]]) * int(self.coordinator.data[self.dict_key["current"]]) if self.coordinator.data["battery_state"] == "charging" else 0
-        self._attr_native_value = 0 - abs(data)
+        self._attr_native_value = abs(data)
         self.async_write_ha_state()
 
-class SermatecBatteryDisChargingPowerSensor(SermatecSensor):
+class SermatecBatteryDischargingPowerSensor(SermatecSensor):
     """
     Special Sermatec sensor for battery discharging power from current and voltage,
     if actual battery_state is different "discharging" return 0
