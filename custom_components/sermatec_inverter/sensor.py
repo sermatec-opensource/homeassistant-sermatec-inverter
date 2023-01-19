@@ -611,7 +611,7 @@ class SermatecBatteryChargingPowerSensor(SermatecSensor):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        data: int = int(self.coordinator.data[self.dict_key["voltage"]]) * int(self.coordinator.data[self.dict_key["current"]]) if self.coordinator.data["battery_state"] == "charging" else 0
+        data = self.coordinator.data[self.dict_key["voltage"]] * self.coordinator.data[self.dict_key["current"]] if self.coordinator.data["battery_state"] == "charging" else 0
         self._attr_native_value = abs(data)
         self.async_write_ha_state()
 
@@ -629,7 +629,7 @@ class SermatecBatteryDischargingPowerSensor(SermatecSensor):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        data: int = int(self.coordinator.data[self.dict_key["voltage"]]) * int(self.coordinator.data[self.dict_key["current"]]) if self.coordinator.data["battery_state"] == "discharging" else 0
+        data = self.coordinator.data[self.dict_key["voltage"]] * self.coordinator.data[self.dict_key["current"]] if self.coordinator.data["battery_state"] == "discharging" else 0
         self._attr_native_value = abs(data)
         self.async_write_ha_state()
 
