@@ -547,8 +547,8 @@ class SermatecPositiveSensor(SermatecSensorBase):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        data : int = int(self.coordinator.data[self.dict_key])
-        self._attr_native_value = abs(data) if data > 0 else 0
+        data = self.coordinator.data[self.dict_key]
+        self._attr_native_value = data if data > 0 else 0
         self.async_write_ha_state()
 
 class SermatecNegativeSensor(SermatecSensor):
@@ -562,7 +562,7 @@ class SermatecNegativeSensor(SermatecSensor):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        data : int = int(self.coordinator.data[self.dict_key])
+        data = self.coordinator.data[self.dict_key]
         self._attr_native_value = abs(data) if data < 0 else 0
         self.async_write_ha_state()
 
@@ -578,8 +578,8 @@ class SermatecPositivePowerSensor(SermatecSensor):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        data : int = int(self.coordinator.data[self.dict_key["voltage"]]) * int(self.coordinator.data[self.dict_key["current"]])
-        self._attr_native_value = abs(data) if data > 0 else 0
+        data = self.coordinator.data[self.dict_key["voltage"]] * self.coordinator.data[self.dict_key["current"]]
+        self._attr_native_value = data if data > 0 else 0
         self.async_write_ha_state()
 
 class SermatecNegativePowerSensor(SermatecSensor):
@@ -594,7 +594,7 @@ class SermatecNegativePowerSensor(SermatecSensor):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        data : int = int(self.coordinator.data[self.dict_key["voltage"]]) * int(self.coordinator.data[self.dict_key["current"]])
+        data = self.coordinator.data[self.dict_key["voltage"]] * self.coordinator.data[self.dict_key["current"]]
         self._attr_native_value = abs(data) if data < 0 else 0
         self.async_write_ha_state()
 
@@ -609,5 +609,5 @@ class SermatecPVTotalPowerSensor(SermatecSensor):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        self._attr_native_value = int(self.coordinator.data[self.dict_key["pv1"]]) + int(self.coordinator.data[self.dict_key["pv2"]])
+        self._attr_native_value = self.coordinator.data[self.dict_key["pv1"]] + self.coordinator.data[self.dict_key["pv2"]]
         self.async_write_ha_state()
