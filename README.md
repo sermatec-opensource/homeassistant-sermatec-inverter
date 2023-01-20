@@ -18,7 +18,10 @@ Notes:
 
 ## Tips
 ### Calculating total energy
-To use this integration with Energy Dashboard or to calculate energy usage/import/export etc. you need to use the Riemann sum integration. Example below:
+To use this integration with Energy Dashboard or to calculate energy usage/import/export etc. you need to use the [Riemann sum integration](https://www.home-assistant.io/integrations/integration/). You can use a new GUI setup in a Helpers category (which is recommended), or an old yaml config method, example is below. Do not forget to set:
+- metric prefix (unit_prefix) to `k` and integration time (unit_time) to `h` (hours) to get values in `kWh` - important to be able to use these in the Energy dashboard!
+- integral method (method) to `left`, otherwise there will be **very** inaccurate results!
+
 ```
 sensor:
   - platform: integration
@@ -27,42 +30,49 @@ sensor:
     unique_id: sermatec_energy_grid_export
     unit_prefix: k
     round: 2
+    method: left
   - platform: integration
     source: sensor.solar_inverter_grid_import
     name: Grid import
     unique_id: sermatec_energy_grid_import
     unit_prefix: k
     round: 2
+    method: left
   - platform: integration
     source: sensor.solar_inverter_pv_total_power
     name: PV total energy
     unique_id: sermatec_energy_pv_total
     unit_prefix: k
     round: 2
+    method: left
   - platform: integration
     source: sensor.solar_inverter_pv1_power
     name: PV1 energy
     unique_id: sermatec_energy_pv1
     unit_prefix: k
     round: 2
+    method: left
   - platform: integration
     source: sensor.solar_inverter_pv2_power
     name: PV2 energy
     unique_id: sermatec_energy_pv2
     unit_prefix: k
     round: 2
+    method: left
   - platform: integration
     source: sensor.solar_inverter_battery_charging_power
     name: Battery charging energy
     unique_id: sermatec_energy_battery_charging
     unit_prefix: k
     round: 2
+    method: left
   - platform: integration
     source: sensor.solar_inverter_battery_discharging_power
     name: Battery discharging energy
     unique_id: sermatec_energy_battery_discharging
     unit_prefix: k
     round: 2
+    method: left
 ``` 
 
 ### Daily, weekly or monthly consumption
@@ -75,4 +85,4 @@ Only tested device is the `Sermatec SMT-10K-TL-TH`. However, probably all reside
 Inverter communication script is in development in [this repository](https://github.com/andreondra/sermatec-inverter), which includes also a detailed documentation.
 
 ## Disclaimer
-Because the protocol used for local communication is reverse-engineered (due to the lack of the official documentation,) I am not responsible for any damage that this integration could cause to your inverter or to your house wiring / electrical equipment.
+Because the protocol used for local communication is reverse-engineered (due to the lack of the official documentation), I am not responsible for any damage that this integration could cause to your inverter or to your house wiring / electrical equipment.
