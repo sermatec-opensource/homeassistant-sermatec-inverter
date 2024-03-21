@@ -32,7 +32,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         entry.data['port']
     )
     
-    hass.config_entries.async_setup_platforms(entry, PLATFORMS)
+    # This creates each HA object for each platform (sensor, button...) the integration requires.
+    # It's done by calling the `async_setup_entry` function in each platform module.
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     return True
 
