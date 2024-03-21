@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 
-from sermatec_inverter import Sermatec
+from .sermatec_inverter import Sermatec
 
 from .const import DOMAIN
 
@@ -31,7 +31,6 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     """
 
     smc_api : Sermatec = Sermatec(
-        _LOGGER,
         data["host"],
         data["port"]
     )

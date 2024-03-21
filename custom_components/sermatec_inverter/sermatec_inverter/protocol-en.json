@@ -1,0 +1,4850 @@
+{
+  "osim": {
+    "id": "osim",
+    "name": "optical storage all-in-one machine protocol",
+    "versions" : [
+      {
+        "version": 0,
+        "queryCommands": ["98"],
+        "commands": [
+          {
+            "type": "98",
+            "comment": "System Information Query",
+            "op": "1",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "tag": "pcuVersion",
+                "type": "int",
+                "name": "protocol version number"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Battery manufacturer number (code list)"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "name": "model code"
+              },
+              {
+                "order": 3,
+                "byteLen": 26,
+                "tag": "sn",
+                "type": "string",
+                "name": "product_sn"
+              },
+              {
+                "order": 4,
+                "byteLen": 18,
+                "type": "string",
+                "name": "product_sn_ln"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "version": 252,
+        "queryCommands": ["0C", "0A", "0B", "1E", "1F", "99", "95"],
+        "commands": [
+          {
+            "type": "0A",
+            "comment": "Battery information display",
+            "op": 1,
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "battery voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "int",
+                "name": "battery current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "name": "battery temperature",
+                "unitValue": "0.1",
+                "unitType": "C"
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "battery soc"
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "int",
+                "name": "battery soh"
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Charge and discharge status",
+                "parser": "batteryStatus"
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "battery max charging current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "battery max discharging current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 8,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "charge cut-off voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 9,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "discharge cut-off voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 10,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Charge/discharge times"
+              },
+              {
+                "order": 11,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "battery pressure"
+              },
+              {
+                "order": 12,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "battery warning"
+              },
+              {
+                "order": 13,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "battery error"
+              },
+              {
+                "order": 14,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Battery communication connection status"
+              }
+            ]
+          },
+          {
+            "type": "0B",
+            "comment": "Control cabinet information display",
+            "op": 1,
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "PV1 voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "int",
+                "name": "PV1 current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "name": "PV1 power",
+                "unitValue": "1",
+                "unitType": "W"
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "PV2 voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "int",
+                "name": "PV2 current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "int",
+                "name": "PV2 power",
+                "unitValue": "1",
+                "unitType": "W"
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Inverter A phase voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Inverter A phase current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 8,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Grid A phase voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 9,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Grid AB line voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 10,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Grid A phase current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 11,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Inverter B phase voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 12,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Inverter B phase current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 13,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Grid B phase voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 14,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Grid BC line voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 15,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Grid B phase current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 16,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Inverter C phase voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 17,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Inverter C phase current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 18,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "grid C phase voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 19,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Grid CA line voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 20,
+                "byteLen": 2,
+                "type": "int",
+                "name": "grid C phase current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 21,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "grid frequency",
+                "unitValue": "0.01",
+                "unitType": "HZ"
+              },
+              {
+                "order": 22,
+                "byteLen": 2,
+                "type": "int",
+                "name": "power factor",
+                "unitValue": "0.001"
+              },
+              {
+                "order": 23,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Grid active power",
+                "unitValue": "1",
+                "unitType": "W"
+              },
+              {
+                "order": 24,
+                "byteLen": 2,
+                "type": "int",
+                "name": "grid reactive power",
+                "unitValue": "1",
+                "unitType": "W"
+              },
+              {
+                "order": 25,
+                "byteLen": 2,
+                "type": "int",
+                "name": "grid apparent power",
+                "unitValue": "1",
+                "unitType": "Var"
+              },
+              {
+                "order": 26,
+                "byteLen": 2,
+                "type": "int",
+                "name": "battery current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 27,
+                "byteLen": 2,
+                "type": "int",
+                "name": "battery voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 28,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "DC positive bus voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 29,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "DC negative bus voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 30,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "DC bilateral bus voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 31,
+                "byteLen": 2,
+                "type": "int",
+                "name": "DC power",
+                "unitValue": "1",
+                "unitType": "W"
+              },
+              {
+                "order": 32,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "internal temperature",
+                "unitValue": "0.1",
+                "unitType": "℃"
+              },
+              {
+                "order": 33,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "10K: DC positive bus backup voltage 5/6K: Secondary bus 1",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 34,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "10K: DC negative bus backup voltage 5/6K: Secondary bus 2",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 35,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "device type code"
+              },
+              {
+                "order": 36,
+                "byteLen": 2,
+                "type": "uInt",
+                "tag": "dspHighVersion",
+                "name": "The high digit of the software version number"
+              },
+              {
+                "order": 37,
+                "byteLen": 2,
+                "type": "uInt",
+                "tag": "dspLowVersion",
+                "name": "The lower digit of the software version number"
+              },
+              {
+                "order": 38,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Parallel address"
+              },
+              {
+                "order": 39,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "work efficiency"
+              },
+              {
+                "order": 40,
+                "byteLen": 2,
+                "type": "int",
+                "name": "battery current 1",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 41,
+                "byteLen": 2,
+                "type": "int",
+                "name": "battery current 2",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 42,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Module A1 temperature",
+                "unitValue": "0.1",
+                "unitType": "℃"
+              },
+              {
+                "order": 43,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Module B1 temperature",
+                "unitValue": "0.1",
+                "unitType": "℃"
+              },
+              {
+                "order": 44,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Module C1 temperature",
+                "unitValue": "0.1",
+                "unitType": "℃"
+              },
+              {
+                "order": 45,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "backup phase A voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 46,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "backup phase B voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 47,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "backup phase C voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 48,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "backup voltage frequency",
+                "unitValue": "0.01",
+                "unitType": "HZ"
+              },
+              {
+                "order": 49,
+                "byteLen": 2,
+                "type": "int",
+                "name": "backup phase A current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 50,
+                "byteLen": 2,
+                "type": "int",
+                "name": "backup phase B current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 51,
+                "byteLen": 2,
+                "type": "int",
+                "name": "backup phase C current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 52,
+                "byteLen": 2,
+                "type": "int",
+                "name": "backup power factor",
+                "unitValue": "0.001"
+              },
+              {
+                "order": 53,
+                "byteLen": 2,
+                "type": "int",
+                "name": "backup active power",
+                "unitValue": "1",
+                "unitType": "VA"
+              },
+              {
+                "order": 54,
+                "byteLen": 2,
+                "type": "int",
+                "name": "backup reactive power",
+                "unitValue": "1",
+                "unitType": "Var"
+              },
+              {
+                "order": 55,
+                "byteLen": 2,
+                "type": "int",
+                "name": "backup apparent power",
+                "unitValue": "1",
+                "unitType": "W"
+              }
+            ]
+          },
+          {
+            "type": "0C",
+            "comment": "Equipment running status",
+            "op": 1,
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "bit",
+                "name": "grid power down",
+                "bitPosition": 14
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "bit",
+                "name": "power derating flag",
+                "same": true,
+                "bitPosition": 13
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "bit",
+                "name": "Single/Parallel logo",
+                "same": true,
+                "bitPosition": 12
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "bit",
+                "name": "master/slave flag",
+                "same": true,
+                "bitPosition": 11
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "bit",
+                "name": "Parallel battery connection type",
+                "same": true,
+                "bitPosition": 10
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "battery status",
+                "same": true,
+                "fromBit": 8,
+                "endBit": 10
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "AC side running status",
+                "same": true,
+                "fromBit": 5,
+                "endBit": 8
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "bit",
+                "name": "Relay self-test enable",
+                "same": true,
+                "bitPosition": 4
+              },
+              {
+                "order": 8,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "AC side operation mode",
+                "same": true,
+                "fromBit": 1,
+                "endBit": 4
+              },
+              {
+                "order": 9,
+                "byteLen": 2,
+                "type": "bit",
+                "name": "inverter switched on",
+                "tag": "onOff",
+                "same": true,
+                "bitPosition": 0
+              },
+              {
+                "order": 10,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "inverter status word",
+                "same": true
+              },
+              {
+                "order": 11,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "PV side self-test steps",
+                "fromBit": 10,
+                "endBit": 13
+              },
+              {
+                "order": 12,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "DC side self-test steps",
+                "same": true,
+                "fromBit": 7,
+                "endBit": 10
+              },
+              {
+                "order": 13,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "AC side self-test steps",
+                "same": true,
+                "fromBit": 4,
+                "endBit": 7
+              },
+              {
+                "order": 14,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "DC side running status",
+                "same": true,
+                "fromBit": 2,
+                "endBit": 4
+              },
+              {
+                "order": 15,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "PV side running status",
+                "same": true,
+                "fromBit": 0,
+                "endBit": 2
+              },
+              {
+                "order": 16,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "PV status word",
+                "same": true
+              },
+              {
+                "order": 17,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "number of units running in parallel",
+                "same": true,
+                "fromBit": 13,
+                "endBit": 16
+              }
+            ]
+          },
+          {
+            "type": "1E",
+            "comment": "BMS alarm information display",
+            "op": 1,
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 12,
+                "type": "onePosition",
+                "tag": "bmsWarn1",
+                "name": "battery warning 0",
+                "group": 2
+              }
+            ]
+          },
+          {
+            "type": "1F",
+            "comment": "System fault status display",
+            "op": 1,
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "onePosition",
+                "tag": "sysFault1",
+                "name": "Fault status word 0"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "onePosition",
+                "tag": "sysFault2",
+                "name": "Fault status word 1"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "onePosition",
+                "tag": "sysFault3",
+                "name": "Fault status word 2"
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "tag": "sysFault4",
+                "type": "onePosition",
+                "name": "Fault status word 3"
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "tag": "sysFault5",
+                "type": "onePosition",
+                "name": "Fault status word 4"
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "preserve",
+                "name": "reserve"
+              }
+            ]
+          },
+          {
+            "type": "64",
+            "comment": "Control command settings",
+            "op": "2",
+            "attach": {"checkCommand": "0C"},
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 1,
+                "type": "hex",
+                "tag": "onOff",
+                "name": "PcuOnOff",
+                "converter": "map(1:55, 0:AA)",
+                "validate": "enumStr(55,aa)"
+              }
+            ]
+          },
+          {
+            "type": "66",
+            "comment": "Operating mode setting",
+            "op": "2",
+            "attach": {"checkCommand": "95"},
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price1",
+                "name": "unit electricity price (tip)",
+                "unitType": "currency",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price2",
+                "name": "unit electricity price (peak)",
+                "unitType": "currency",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price3",
+                "name": "unit electricity price (flat)",
+                "unitType": "currency",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price4",
+                "name": "unit electricity price (valley)",
+                "unitType": "currency",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "con",
+                "name": "Grid-connected power upper limit"
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "chargePower",
+                "name": "Battery charging and discharging power (command mode is valid)"
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "style",
+                "name": "Operating mode",
+                "validate": "enum(0,1,2,3,4,5,6)"
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "gridSwitch",
+                "name": "PV and off-grid",
+                "validate": "enum(0,1,2)"
+              },
+              {
+                "order": 8,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "adjustMethod",
+                "name": "Grid voltage drop adjustment method",
+                "validate": "enum(0,1,2,3)"
+              },
+              {
+                "order": 9,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "refluxs",
+                "name": "anti-backflow function",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 10,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "batteryCharge",
+                "name": "Battery charging and discharging (command mode takes effect)",
+                "validate": "enum(0,1,2,3,4)"
+              },
+              {
+                "order": 11,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "soc",
+                "name": "Grid-connected SOC lower limit setting"
+              },
+              {
+                "order": 12,
+                "byteLen": 2,
+                "type": "int",
+                "name": "How many sets of data are there",
+                "validate": "max(16)"
+              },
+              {
+                "order": 13,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "startTime",
+                "groupTag": "elecPrice",
+                "name": "start time",
+                "converter": "timeToMin",
+                "validate": "valRange(0-1440)",
+                "repeatGroup": 0,
+                "repeatRef": 12
+              },
+              {
+                "order": 14,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "endTime",
+                "groupTag": "elecPrice",
+                "converter": "timeToMin",
+                "name": "End Time",
+                "validate": "valRange(0-1440)",
+                "repeatGroup": 0,
+                "repeatRef": 12
+              },
+              {
+                "order": 15,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "electricityTypeValue",
+                "groupTag": "elecPrice",
+                "name": "peaks and valleys",
+                "validate": "enum(0,1,2,3,4)",
+                "repeatGroup": 0,
+                "repeatRef": 12
+              }
+            ]
+          },
+          {
+            "type": "67",
+            "comment": "Custom Mode Settings",
+            "op": "2",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to charge (tip) when SOC<10",
+                "validate": "enum(1,2)"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to discharge (tip) when SOC>20",
+                "validate": "enum(1,2)"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to charge (peak) when SOC<10",
+                "validate": "enum(1,2)"
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to discharge (peak) when SOC>20",
+                "validate": "enum(1,2)"
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to charge (flat) when SOC<10",
+                "validate": "enum(1,2)"
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to discharge when SOC>20 (flat)",
+                "validate": "enum(1,2)"
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to charge (valley) when SOC<10",
+                "validate": "enum(1,2)"
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to discharge (valley) when SOC>20",
+                "validate": "enum(1,2)"
+              }
+            ]
+          },
+          {
+            "type": "68",
+            "comment": "Time Calibration Settings",
+            "op": "2",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "year",
+                "name": "YEAR"
+              },
+              {
+                "order": 1,
+                "byteLen": 1,
+                "type": "int",
+                "tag": "month",
+                "name": "MONTH"
+              },
+              {
+                "order": 2,
+                "byteLen": 1,
+                "type": "int",
+                "tag": "day",
+                "name": "DAY"
+              },
+              {
+                "order": 3,
+                "byteLen": 1,
+                "type": "int",
+                "tag": "hour",
+                "name": "HOUR"
+              },
+              {
+                "order": 4,
+                "byteLen": 1,
+                "type": "int",
+                "tag": "minute",
+                "name": "MINUTE"
+              },
+              {
+                "order": 5,
+                "byteLen": 1,
+                "type": "int",
+                "tag": "second",
+                "name": "SECOND"
+              }
+            ]
+          },
+          {
+            "type": "69",
+            "comment": "Grid battery type setting",
+            "op": "2",
+            "attach": {"shouldCloseConnection":  true},
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "elecCode",
+                "name": "grid code"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "dcBatteryType",
+                "name": "DC side battery type"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "ah",
+                "name": "AH value of lead-acid battery"
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "batteryProtocol",
+                "name": "Battery communication protocol selection"
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "meterProtocol",
+                "name": "Meter communication protocol selection"
+              }
+            ]
+          },
+          {
+            "type": "70",
+            "comment": "reset",
+            "op": "2",
+            "attach": {"shouldCloseConnection":  true},
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Reset",
+                "converter": "const(00FF)",
+                "validate": "enumStr(00FF)"
+              }
+            ]
+          },
+          {
+            "type": "94",
+            "comment": "Set WIFI password",
+            "op": "3",
+            "attach": {"shouldCloseConnection":  true},
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 0,
+                "type": "string",
+                "tag": "passwd",
+                "name": "character",
+                "converter": "subZero",
+                "validate": "lenRange(8-16)"
+              }
+            ]
+          },
+          {
+            "type": "99",
+            "comment": "total power data",
+            "return": "99,9A,9B,9C",
+            "op": "1",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "name": "PV daily power generation",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 1,
+                "byteLen": 4,
+                "type": "long",
+                "name": "Total photovoltaic power generation"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "name": "load daily power consumption",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 3,
+                "byteLen": 4,
+                "type": "long",
+                "name": "Total load power consumption"
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Save money on electricity today",
+                "unitValue": "0.1",
+                "precision": 1
+              },
+              {
+                "order": 5,
+                "byteLen": 4,
+                "type": "long",
+                "name": "total savings on electricity bills",
+                "unitValue": "0.1",
+                "precision": 1
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "int",
+                "name": "PVPowerDay",
+                "unitValue": "0.1",
+                "precision": 1,
+                "repeat": 48
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "int",
+                "name": "PVPowerMonth",
+                "repeat": 31
+              },
+              {
+                "order": 8,
+                "byteLen": 4,
+                "type": "long",
+                "name": "PVPowerYear",
+                "repeat": 12
+              },
+              {
+                "order": 9,
+                "byteLen": 4,
+                "type": "long",
+                "name": "PVPowerHistory",
+                "repeat": 5
+              }
+            ]
+          },
+          {
+            "type": "9A",
+            "comment": "Grid power data",
+            "op": "1",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Grid-connected electricity consumption today",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 1,
+                "byteLen": 4,
+                "type": "long",
+                "name": "Grid-connected total power consumption"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "name": "PowerDay",
+                "unitValue": "0.1",
+                "precision": 1,
+                "repeat": 48
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "int",
+                "name": "PowerMonth",
+                "repeat": 31
+              },
+              {
+                "order": 4,
+                "byteLen": 4,
+                "type": "long",
+                "name": "PowerYear",
+                "repeat": 12
+              },
+              {
+                "order": 5,
+                "byteLen": 4,
+                "type": "long",
+                "name": "PowerHistory",
+                "repeat": 5
+              }
+            ]
+          },
+          {
+            "type": "9B",
+            "comment": "Load power data",
+            "op": "1",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "name": "load today's power consumption",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 1,
+                "byteLen": 4,
+                "type": "long",
+                "name": "Total load power consumption"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "name": "PowerDay",
+                "unitValue": "0.1",
+                "precision": 1,
+                "repeat": 48
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "int",
+                "name": "PowerMonth",
+                "repeat": 31
+              },
+              {
+                "order": 4,
+                "byteLen": 4,
+                "type": "long",
+                "name": "PowerYear",
+                "repeat": 12
+              },
+              {
+                "order": 5,
+                "byteLen": 4,
+                "type": "long",
+                "name": "PowerHistory",
+                "repeat": 5
+              }
+            ]
+          },
+          {
+            "type": "95",
+            "comment": "Set parameter query",
+            "op": "1",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price1",
+                "name": "unit electricity price (tip)",
+                "unitType": "currency",
+                "unitValue": "0.1",
+                "precision": 1
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price2",
+                "name": "unit electricity price (peak)",
+                "unitType": "currency",
+                "unitValue": "0.1",
+                "precision": 1
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price3",
+                "name": "unit electricity price (flat)",
+                "unitType": "currency",
+                "unitValue": "0.1",
+                "precision": 1
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price4",
+                "name": "unit electricity price (valley)",
+                "unitType": "currency",
+                "unitValue": "0.1",
+                "precision": 1
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "con",
+                "name": "Grid-connected power upper limit",
+                "unitType": "W"
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "chargePower",
+                "name": "Battery charging and discharging power (command mode is valid)"
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "style",
+                "name": "Operating mode",
+                "parser": "operatingMode"
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "gridSwitch",
+                "name": "PV and off-grid"
+              },
+              {
+                "order": 8,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "adjustMethod",
+                "name": "Grid voltage drop adjustment method"
+              },
+              {
+                "order": 9,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "refluxs",
+                "converter": "map(ee00:1, 00ee:2, default:0)",
+                "name": "anti-backflow function"
+              },
+              {
+                "order": 10,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "batteryCharge",
+                "name": "Battery charging and discharging (command mode takes effect)"
+              },
+              {
+                "order": 11,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "soc",
+                "name": "Grid-connected SOC lower limit setting"
+              },
+              {
+                "order": 12,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "totalPriceNum",
+                "name": "How many sets of data are there"
+              },
+              {
+                "order": 13,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "startTime",
+                "groupTag": "elecPrice",
+                "converter": "minToTime",
+                "name": "start time",
+                "repeat": 16,
+                "repeatGroup": 0
+              },
+              {
+                "order": 14,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "endTime",
+                "groupTag": "elecPrice",
+                "converter": "minToTime",
+                "name": "End Time",
+                "repeat": 16,
+                "repeatGroup": 0
+              },
+              {
+                "order": 15,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "electricityTypeValue",
+                "groupTag": "elecPrice",
+                "name": "peaks and valleys",
+                "repeat": 16,
+                "repeatGroup": 0
+              },
+              {
+                "order": 16,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to charge (tip) when SOC<10"
+              },
+              {
+                "order": 17,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to discharge (tip) when SOC>20"
+              },
+              {
+                "order": 18,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to charge (peak) when SOC<10"
+              },
+              {
+                "order": 19,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to discharge (peak) when SOC>20"
+              },
+              {
+                "order": 20,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to charge (flat) when SOC<10"
+              },
+              {
+                "order": 21,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to discharge when SOC>20 (flat)"
+              },
+              {
+                "order": 22,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to charge (valley) when SOC<10"
+              },
+              {
+                "order": 23,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to discharge (valley) when SOC>20"
+              },
+              {
+                "order": 24,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "elecCode",
+                "name": "grid code"
+              },
+              {
+                "order": 25,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "dcBatteryType",
+                "name": "DC side battery type"
+              },
+              {
+                "order": 26,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "ah",
+                "name": "AH value of lead-acid battery"
+              },
+              {
+                "order": 27,
+                "byteLen": 2,
+                "tag": "batteryProtocol",
+                "type": "int",
+                "name": "Battery communication protocol selection"
+              },
+              {
+                "order": 28,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "meterProtocol",
+                "name": "Meter communication protocol selection"
+              }
+            ]
+          },
+          {
+            "type": "9E",
+            "comment": "Set router information",
+            "op": "3",
+            "attach": {"shouldCloseConnection":  true},
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 1,
+                "type": "int",
+                "tag": "style",
+                "name": "WifiOperating mode",
+                "validate": "enum(0,1)"
+              },
+              {
+                "order": 1,
+                "byteLen": 30,
+                "type": "string",
+                "tag": "ssid",
+                "name": "router SSID",
+                "converter": "subZero",
+                "validate": "lenRange(1, 31)"
+              },
+              {
+                "order": 2,
+                "byteLen": 30,
+                "type": "string",
+                "tag": "password",
+                "name": "Router PASSWORD",
+                "converter": "subZero",
+                "validate": "lenRange(1, 31)"
+              }
+            ]
+          },
+          {
+            "type": "9F",
+            "comment": "Set cloud server information",
+            "op": "3",
+            "attach": {"shouldCloseConnection":  true},
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 20,
+                "type": "string",
+                "tag": "ip",
+                "name": "server IP",
+                "converter": "subZero",
+                "validate": "ip"
+              },
+              {
+                "order": 1,
+                "byteLen": 10,
+                "type": "string",
+                "tag": "port",
+                "converter": "subZero",
+                "name": "server port number"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "version": 258,
+        "queryCommands": ["0C", "0A", "0B", "0D", "1E", "1F", "99", "95"],
+        "commands": [
+          {
+            "type": "66",
+            "comment": "Operating mode setting",
+            "op": "2",
+            "attach": {"checkCommand": "95", "subCommandType": "6A"},
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price1",
+                "name": "unit electricity price (tip)",
+                "unitType": "currency",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price2",
+                "name": "unit electricity price (peak)",
+                "unitType": "currency",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price3",
+                "name": "unit electricity price (flat)",
+                "unitType": "currency",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price4",
+                "name": "unit electricity price (valley)",
+                "unitType": "currency",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "con",
+                "name": "Grid-connected power upper limit"
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "chargePower",
+                "name": "Battery charging and discharging power (command mode is valid)"
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "style",
+                "name": "Operating mode",
+                "validate": "enum(0,1,2,3,4,5,6)"
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "gridSwitch",
+                "name": "PV and off-grid",
+                "validate": "enum(0,1,2)"
+              },
+              {
+                "order": 8,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "adjustMethod",
+                "name": "Grid voltage drop adjustment method",
+                "validate": "enum(0,1,2,3)"
+              },
+              {
+                "order": 9,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "refluxs",
+                "name": "anti-backflow function",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 10,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "batteryCharge",
+                "name": "Battery charging and discharging (command mode takes effect)",
+                "validate": "enum(0,1,2,3,4)"
+              },
+              {
+                "order": 11,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "soc",
+                "name": "Grid-connected SOC lower limit setting"
+              },
+              {
+                "order": 12,
+                "byteLen": 2,
+                "type": "int",
+                "name": "How many sets of data are there",
+                "validate": "max(16)"
+              },
+              {
+                "order": 13,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "startTime",
+                "groupTag": "elecPrice",
+                "name": "start time",
+                "converter": "timeToMin",
+                "validate": "valRange(0-1440)",
+                "repeatGroup": 0,
+                "repeatRef": 12
+              },
+              {
+                "order": 14,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "endTime",
+                "groupTag": "elecPrice",
+                "converter": "timeToMin",
+                "name": "End Time",
+                "validate": "valRange(0-1440)",
+                "repeatGroup": 0,
+                "repeatRef": 12
+              },
+              {
+                "order": 15,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "electricityTypeValue",
+                "groupTag": "elecPrice",
+                "name": "peaks and valleys",
+                "validate": "enum(0,1,2,3,4)",
+                "repeatGroup": 0,
+                "repeatRef": 12
+              }
+            ]
+          },
+          {
+            "type": "0D",
+            "comment": "bmsMeter connection status",
+            "op": 1,
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "name": "bms connection status"
+              },{
+                "order": 1,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Meter connection status"
+              },{
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "name": "remote load"
+              }
+            ]
+          },
+          {
+            "type": "1E",
+            "comment": "BMS alarm information display",
+            "op": 1,
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 12,
+                "type": "onePosition",
+                "tag": "bmsWarn1",
+                "name": "battery warning 0",
+                "group": 2
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "tag": "bmsWarn",
+                "type": "onePosition",
+                "name": "Comprehensive battery warning 1"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "preserve",
+                "name": "reserve"
+              }
+            ]
+          },
+          {
+            "type": "6A",
+            "comment": "Operating mode setting 2",
+            "op": "2",
+            "attach": {"checkCommand":  "95"},
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Meter detection function",
+                "tag": "meterMonitor",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Three-phase unbalanced output",
+                "tag": "threePhase",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "offGridSoc",
+                "name": "Off-grid SOC lower limit setting"
+              },
+              {
+                "order": 3,
+                "byteLen": 40,
+                "type": "preserve",
+                "name": "Reserve 20 control commands"
+              }
+            ]
+          },
+          {
+            "type": "9C",
+            "comment": "Grid battery power data",
+            "op": "1",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "name": "The grid buys electricity on the same day",
+                "unitValue": "0.1"
+              },{
+                "order": 1,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Battery charging on the day",
+                "unitValue": "0.1"
+              },{
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "name": "battery discharge on the day",
+                "unitValue": "0.1"
+              },{
+                "order": 3,
+                "byteLen": 4,
+                "type": "long",
+                "name": "total grid electricity purchase"
+              },{
+                "order": 4,
+                "byteLen": 4,
+                "type": "long",
+                "name": "total daily battery charge",
+                "unitValue": "0.1",
+                "precision": 1
+              },{
+                "order": 5,
+                "byteLen": 4,
+                "type": "long",
+                "name": "total daily battery discharge",
+                "unitValue": "0.1",
+                "precision": 1
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "int",
+                "name": "remote load"
+              }
+            ]
+          },
+          {
+            "type": "A1",
+            "comment": "Query DRM status",
+            "op": "1",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "bit",
+                "name": "DRM8",
+                "bitPosition": "8"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "bit",
+                "name": "DRM7",
+                "bitPosition": "7",
+                "same": true
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "bit",
+                "name": "DRM6",
+                "bitPosition": "6",
+                "same": true
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "bit",
+                "name": "DRM5",
+                "bitPosition": "5",
+                "same": true
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "bit",
+                "name": "DRM4",
+                "bitPosition": "4",
+                "same": true
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "bit",
+                "name": "DRM3",
+                "bitPosition": "3",
+                "same": true
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "bit",
+                "name": "DRM2",
+                "bitPosition": "2",
+                "same": true
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "bit",
+                "name": "DRM1",
+                "bitPosition": "1",
+                "same": true
+              },
+              {
+                "order": 8,
+                "byteLen": 2,
+                "type": "bit",
+                "name": "DRM0",
+                "bitPosition": "0",
+                "same": true
+              }
+            ]
+          },
+          {
+            "type": "95",
+            "comment": "Set parameter query",
+            "op": "1",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price1",
+                "name": "unit electricity price (tip)",
+                "unitType": "currency",
+                "unitValue": "0.1",
+                "precision": 1
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price2",
+                "name": "unit electricity price (peak)",
+                "unitType": "currency",
+                "unitValue": "0.1",
+                "precision": 1
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price3",
+                "name": "unit electricity price (flat)",
+                "unitType": "currency",
+                "unitValue": "0.1",
+                "precision": 1
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price4",
+                "name": "unit electricity price (valley)",
+                "unitType": "currency",
+                "unitValue": "0.1",
+                "precision": 1
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "con",
+                "name": "Grid-connected power upper limit",
+                "unitType": "W"
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "chargePower",
+                "name": "Battery charging and discharging power (command mode is valid)"
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "style",
+                "name": "Operating mode",
+                "parser": "operatingMode"
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "gridSwitch",
+                "name": "PV and off-grid"
+              },
+              {
+                "order": 8,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "adjustMethod",
+                "name": "Grid voltage drop adjustment method"
+              },
+              {
+                "order": 9,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "refluxs",
+                "converter": "map(ee00:1, 00ee:2, default:0)",
+                "name": "anti-backflow function"
+              },
+              {
+                "order": 10,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "batteryCharge",
+                "name": "Battery charging and discharging (command mode takes effect)"
+              },
+              {
+                "order": 11,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "soc",
+                "name": "Grid-connected SOC lower limit setting"
+              },
+              {
+                "order": 12,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "totalPriceNum",
+                "name": "How many sets of data are there"
+              },
+              {
+                "order": 13,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "startTime",
+                "groupTag": "elecPrice",
+                "converter": "minToTime",
+                "name": "start time",
+                "repeat": 16,
+                "repeatGroup": 0
+              },
+              {
+                "order": 14,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "endTime",
+                "groupTag": "elecPrice",
+                "converter": "minToTime",
+                "name": "End Time",
+                "repeat": 16,
+                "repeatGroup": 0
+              },
+              {
+                "order": 15,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "electricityTypeValue",
+                "groupTag": "elecPrice",
+                "name": "peaks and valleys",
+                "repeat": 16,
+                "repeatGroup": 0
+              },
+              {
+                "order": 16,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "meterMonitor",
+                "converter": "map(ee00:1, 00ee:2, default:0)",
+                "name": "Meter detection function"
+              },
+              {
+                "order": 17,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "threePhase",
+                "converter": "map(ee00:1, 00ee:2, default:0)",
+                "name": "Three-phase unbalanced output"
+              },
+              {
+                "order": 18,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "offGridSoc",
+                "name": "Off-grid SOC lower limit setting"
+              },
+              {
+                "order": 19,
+                "byteLen": 40,
+                "type": "preserve",
+                "name": "Reserve ten control commands"
+              },
+              {
+                "order": 20,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "elecCode",
+                "name": "grid code"
+              },
+              {
+                "order": 21,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "dcBatteryType",
+                "name": "DC side battery type"
+              },
+              {
+                "order": 22,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "ah",
+                "name": "AH value of lead-acid battery"
+              },
+              {
+                "order": 23,
+                "byteLen": 2,
+                "tag": "batteryProtocol",
+                "type": "int",
+                "name": "Battery communication protocol selection"
+              },
+              {
+                "order": 24,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "meterProtocol",
+                "name": "Meter communication protocol selection"
+              },
+              {
+                "order": 25,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to charge (tip) when SOC<10"
+              },
+              {
+                "order": 26,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to discharge (tip) when SOC>20"
+              },
+              {
+                "order": 27,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to charge (peak) when SOC<10"
+              },
+              {
+                "order": 28,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to discharge (peak) when SOC>20"
+              },
+              {
+                "order": 29,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to charge (flat) when SOC<10"
+              },
+              {
+                "order": 30,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to discharge when SOC>20 (flat)"
+              },
+              {
+                "order": 31,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to charge (valley) when SOC<10"
+              },
+              {
+                "order": 32,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to discharge (valley) when SOC>20"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "version": 259,
+        "queryCommands": ["0C", "0A", "0B", "0D", "1E", "1F", "99", "95"],
+        "commands": [
+          {
+            "type": "6A",
+            "comment": "Operating mode setting 2",
+            "op": "2",
+            "attach": {"checkCommand":  "9D"},
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Meter detection function",
+                "tag": "meterMonitor",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Three-phase unbalanced output",
+                "tag": "threePhase",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "offGridSoc",
+                "name": "Off-grid SOC lower limit setting"
+              },
+              {
+                "order": 3,
+                "byteLen": 40,
+                "type": "preserve",
+                "name": "Reserve 20 control commands"
+              }
+            ]
+          },
+          {
+            "type": "95",
+            "comment": "Set parameter query",
+            "return": "95,9D",
+            "op": "1",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price1",
+                "name": "unit electricity price (tip)",
+                "unitType": "currency",
+                "unitValue": "0.1",
+                "precision": 1
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price2",
+                "name": "unit electricity price (peak)",
+                "unitType": "currency",
+                "unitValue": "0.1",
+                "precision": 1
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price3",
+                "name": "unit electricity price (flat)",
+                "unitType": "currency",
+                "unitValue": "0.1",
+                "precision": 1
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "price4",
+                "name": "unit electricity price (valley)",
+                "unitType": "currency",
+                "unitValue": "0.1",
+                "precision": 1
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "con",
+                "name": "Grid-connected power upper limit",
+                "unitType": "W"
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "chargePower",
+                "name": "Battery charging and discharging power (command mode is valid)"
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "style",
+                "name": "Operating mode",
+                "parser": "operatingMode"
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "gridSwitch",
+                "name": "PV and off-grid"
+              },
+              {
+                "order": 8,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "adjustMethod",
+                "name": "Grid voltage drop adjustment method"
+              },
+              {
+                "order": 9,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "refluxs",
+                "converter": "map(ee00:1, 00ee:2, default:0)",
+                "name": "anti-backflow function"
+              },
+              {
+                "order": 10,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "batteryCharge",
+                "name": "Battery charging and discharging (command mode takes effect)"
+              },
+              {
+                "order": 11,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "soc",
+                "name": "Grid-connected SOC lower limit setting"
+              },
+              {
+                "order": 12,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "totalPriceNum",
+                "name": "How many sets of data are there"
+              },
+              {
+                "order": 13,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "startTime",
+                "groupTag": "elecPrice",
+                "converter": "minToTime",
+                "name": "start time",
+                "repeat": 16,
+                "repeatGroup": 0
+              },
+              {
+                "order": 14,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "endTime",
+                "groupTag": "elecPrice",
+                "converter": "minToTime",
+                "name": "End Time",
+                "repeat": 16,
+                "repeatGroup": 0
+              },
+              {
+                "order": 15,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "electricityTypeValue",
+                "groupTag": "elecPrice",
+                "name": "peaks and valleys",
+                "repeat": 16,
+                "repeatGroup": 0
+              },
+              {
+                "order": 16,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "powerFactor",
+                "name": "power factor setting",
+                "unitValue": "0.001"
+              },
+              {
+                "order": 17,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to discharge (tip) when SOC>20"
+              },
+              {
+                "order": 18,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to charge (peak) when SOC<10"
+              },
+              {
+                "order": 19,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to discharge (peak) when SOC>20"
+              },
+              {
+                "order": 20,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to charge (flat) when SOC<10"
+              },
+              {
+                "order": 21,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to discharge when SOC>20 (flat)"
+              },
+              {
+                "order": 22,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to charge (valley) when SOC<10"
+              },
+              {
+                "order": 23,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Whether to discharge (valley) when SOC>20"
+              },
+              {
+                "order": 24,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "elecCode",
+                "name": "grid code"
+              },
+              {
+                "order": 25,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "dcBatteryType",
+                "name": "DC side battery type"
+              },
+              {
+                "order": 26,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "ah",
+                "name": "AH value of lead-acid battery"
+              },
+              {
+                "order": 27,
+                "byteLen": 2,
+                "tag": "batteryProtocol",
+                "type": "int",
+                "name": "Battery communication protocol selection"
+              },
+              {
+                "order": 28,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "meterProtocol",
+                "name": "Meter communication protocol selection"
+              }
+            ]
+          },
+          {
+            "type": "9D",
+            "comment": "Set parameter information 2",
+            "op": "1",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "meterMonitor",
+                "converter": "map(ee00:1, 00ee:2, default:0)",
+                "name": "Meter detection function"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "threePhase",
+                "converter": "map(ee00:1, 00ee:2, default:0)",
+                "name": "Three-phase unbalanced output"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "offGridSoc",
+                "name": "Off-grid SOC lower limit setting"
+              },
+              {
+                "order": 3,
+                "byteLen": 40,
+                "type": "preserve",
+                "name": "Twenty control commands are reserved"
+              }
+            ]
+          }
+        ]
+      },
+      {"version": 500,
+        "queryCommands": ["0C", "0A", "0B", "0D", "1E", "1F", "99", "95"],
+        "commands": [
+          {
+            "type": "6A",
+            "comment": "Operating mode setting 2",
+            "op": "2",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Meter detection function",
+                "tag": "meterMonitor",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Three-phase unbalanced output",
+                "tag": "threePhase",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "offGridSoc",
+                "name": "Off-grid SOC lower limit setting"
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "int",
+                "name": "In the micro grid mode the battery SOC hysteresis",
+                "tag": "socDiff"
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "int",
+                "name": "AC coupled PV source selection",
+                "tag": "pvSourceChoice",
+                "validate": "enum(0,1,2,3)"
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "backUpOrder",
+                "name": "Backup load power supply sequence",
+                "validate": "enum(0,1)"
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Whether bypass mode is enabled",
+                "tag": "sideWayEnable",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "backup output function",
+                "tag": "backUpOutEnable",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 8,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "cPowerLimit",
+                "name": "Charging power limit"
+              },
+              {
+                "order": 9,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "dPowerLimit",
+                "name": "Lower limit of discharge power"
+              },
+              {
+                "order": 10,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "batVolSettable",
+                "name": "Whether the battery voltage can be set",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 11,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "batVolUpLimit",
+                "name": "battery voltage upper limit",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 12,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "batVolDownLimit",
+                "name": "battery voltage lower limit",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 13,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "shadowScan",
+                "name": "shadow scan",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 14,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "batActive",
+                "name": "battery activated",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 15,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "acidBatEqVol",
+                "name": "lead-acid battery charging voltage",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 16,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "acidBatFloatVol",
+                "name": "Lead-acid battery float charge voltage",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 17,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "acidBatEOD",
+                "name": "Lead-acid battery EOD",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 18,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "eSCCurUpLimit",
+                "name": "Mains charging current upper limit",
+                "unitType": "A",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 19,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "parallelType",
+                "name": "Parallel battery connection type"
+              },
+              {
+                "order": 20,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "parallelFlag",
+                "name": "Single parallel machine sign"
+              },
+              {
+                "order": 21,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "parallelAddr",
+                "name": "Parallel address"
+              },
+              {
+                "order": 22,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Battery power manual limiter",
+                "tag": "batPowerAdjustable",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              }
+            ]
+          },
+          {
+            "type": "71",
+            "comment": "Set mandatory charging and discharging information",
+            "op": "2",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable forced charging",
+                "tag": "fcOpen",
+                "fromBit": 0,
+                "endBit": 2
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Sunday",
+                "tag": "fcSunEnable",
+                "converter": "map(0:0, 1:1, 2:3, default:0)",
+                "same": true,
+                "fromBit": 2,
+                "endBit": 4
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Monday",
+                "tag": "fcMonEnable",
+                "converter": "map(0:0, 1:1, 2:3, default:0)",
+                "same": true,
+                "fromBit": 4,
+                "endBit": 6
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Tuesday",
+                "tag": "fcTusEnable",
+                "converter": "map(0:0, 1:1, 2:3, default:0)",
+                "same": true,
+                "fromBit": 6,
+                "endBit": 8
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Wednesday",
+                "tag": "fcWenEnable",
+                "converter": "map(0:0, 1:1, 2:3, default:0)",
+                "same": true,
+                "fromBit": 8,
+                "endBit": 10
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Thursday",
+                "tag": "fcThuEnable",
+                "converter": "map(0:0, 1:1, 2:3, default:0)",
+                "same": true,
+                "fromBit": 10,
+                "endBit": 12
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Friday",
+                "tag": "fcFriEnable",
+                "converter": "map(0:0, 1:1, 2:3, default:0)",
+                "same": true,
+                "fromBit": 12,
+                "endBit": 14
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Saturday",
+                "tag": "fcSatEnable",
+                "converter": "map(0:0, 1:1, 2:3, default:0)",
+                "same": true,
+                "fromBit": 14,
+                "endBit": 16
+              },
+              {
+                "order": 8,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Force charging soc upper limit",
+                "tag": "fcSocLimit"
+              },
+              {
+                "order": 9,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Forcibly rush the number of time periods in a day",
+                "tag": "fcTimeRangeLen"
+              },
+              {
+                "order": 10,
+                "byteLen": 2,
+                "type": "int",
+                "name": "start time",
+                "tag": "startTime",
+                "groupTag": "fcTimeGap",
+                "converter": "timeToMin",
+                "repeat": 4,
+                "repeatGroup": 0,
+                "defaultValue": "00:00"
+              },
+              {
+                "order": 11,
+                "byteLen": 2,
+                "type": "int",
+                "name": "End Time",
+                "tag": "endTime",
+                "groupTag": "fcTimeGap",
+                "converter": "timeToMin",
+                "repeat": 4,
+                "repeatGroup": 0,
+                "defaultValue": "00:00"
+              },
+              {
+                "order": 12,
+                "byteLen": 2,
+                "type": "preserve",
+                "name": "reserved fields",
+                "repeat": 4,
+                "repeatGroup": 0
+              },
+              {
+                "order": 13,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable forced discharge",
+                "tag": "fdOpen",
+                "fromBit": 0,
+                "endBit": 2
+              },
+              {
+                "order": 14,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Sunday",
+                "converter": "map(0:0, 1:1, 2:3, default:0)",
+                "tag": "fdSunEnable",
+                "same": true,
+                "fromBit": 2,
+                "endBit": 4
+              },
+              {
+                "order": 15,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Monday",
+                "tag": "fdMonEnable",
+                "converter": "map(0:0, 1:1, 2:3, default:0)",
+                "same": true,
+                "fromBit": 4,
+                "endBit": 6
+              },
+              {
+                "order": 16,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Tuesday",
+                "tag": "fdTusEnable",
+                "converter": "map(0:0, 1:1, 2:3, default:0)",
+                "same": true,
+                "fromBit": 6,
+                "endBit": 8
+              },
+              {
+                "order": 17,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Wednesday",
+                "tag": "fdWenEnable",
+                "converter": "map(0:0, 1:1, 2:3, default:0)",
+                "same": true,
+                "fromBit": 8,
+                "endBit": 10
+              },
+              {
+                "order": 18,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Thursday",
+                "tag": "fdThuEnable",
+                "converter": "map(0:0, 1:1, 2:3, default:0)",
+                "same": true,
+                "fromBit": 10,
+                "endBit": 12
+              },
+              {
+                "order": 19,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Friday",
+                "tag": "fdFriEnable",
+                "converter": "map(0:0, 1:1, 2:3, default:0)",
+                "same": true,
+                "fromBit": 12,
+                "endBit": 14
+              },
+              {
+                "order": 20,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Saturday",
+                "tag": "fdSatEnable",
+                "converter": "map(0:0, 1:1, 2:3, default:0)",
+                "same": true,
+                "fromBit": 14,
+                "endBit": 16
+              },
+              {
+                "order": 21,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Force charging soc upper limit",
+                "tag": "fdSocLimit"
+              },
+              {
+                "order": 22,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Forcibly rush the number of time periods in a day",
+                "tag": "fdTimeRangeLen"
+              },
+              {
+                "order": 23,
+                "byteLen": 2,
+                "type": "int",
+                "name": "start time",
+                "tag": "startTime",
+                "groupTag": "fdTimeGap",
+                "converter": "timeToMin",
+                "repeat": 4,
+                "defaultValue": "00:00",
+                "repeatGroup": 1
+              },
+              {
+                "order": 24,
+                "byteLen": 2,
+                "type": "int",
+                "name": "End Time",
+                "tag": "endTime",
+                "groupTag": "fdTimeGap",
+                "converter": "timeToMin",
+                "repeat": 4,
+                "repeatGroup": 1,
+                "defaultValue": "00:00"
+              },
+              {
+                "order": 25,
+                "byteLen": 2,
+                "type": "preserve",
+                "name": "reserved fields",
+                "repeat": 4,
+                "repeatGroup": 1
+              }
+            ]
+          },
+          {
+            "type": "A2",
+            "comment": "Forced charge and discharge information",
+            "op": "1",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable forced charging",
+                "tag": "fcOpen",
+                "fromBit": 0,
+                "endBit": 2
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Sunday",
+                "tag": "fcSunEnable",
+                "converter": "map(0:0, 1:1, 3:2, default:0)",
+                "same": true,
+                "fromBit": 2,
+                "endBit": 4
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Monday",
+                "tag": "fcMonEnable",
+                "converter": "map(0:0, 1:1, 3:2, default:0)",
+                "same": true,
+                "fromBit": 4,
+                "endBit": 6
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Tuesday",
+                "tag": "fcTusEnable",
+                "converter": "map(0:0, 1:1, 3:2, default:0)",
+                "same": true,
+                "fromBit": 6,
+                "endBit": 8
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Wednesday",
+                "tag": "fcWenEnable",
+                "converter": "map(0:0, 1:1, 3:2, default:0)",
+                "same": true,
+                "fromBit": 8,
+                "endBit": 10
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Thursday",
+                "tag": "fcThuEnable",
+                "converter": "map(0:0, 1:1, 3:2, default:0)",
+                "same": true,
+                "fromBit": 10,
+                "endBit": 12
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Friday",
+                "tag": "fcFriEnable",
+                "converter": "map(0:0, 1:1, 3:2, default:0)",
+                "same": true,
+                "fromBit": 12,
+                "endBit": 14
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Saturday",
+                "tag": "fcSatEnable",
+                "converter": "map(0:0, 1:1, 3:2, default:0)",
+                "same": true,
+                "fromBit": 14,
+                "endBit": 16
+              },
+              {
+                "order": 8,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Force charging soc upper limit",
+                "tag": "fcSocLimit"
+              },
+              {
+                "order": 9,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Forcibly rush the number of time periods in a day",
+                "tag": "fcTimeRangeLen"
+              },
+              {
+                "order": 10,
+                "byteLen": 2,
+                "type": "int",
+                "name": "start time",
+                "tag": "startTime",
+                "groupTag": "fcTimeGap",
+                "converter": "minToTime",
+                "repeat": 4,
+                "repeatGroup": 0,
+                "defaultValue": "00:00"
+              },
+              {
+                "order": 11,
+                "byteLen": 2,
+                "type": "int",
+                "name": "End Time",
+                "tag": "endTime",
+                "groupTag": "fcTimeGap",
+                "converter": "minToTime",
+                "repeat": 4,
+                "repeatGroup": 0,
+                "defaultValue": "00:00"
+              },
+              {
+                "order": 12,
+                "byteLen": 2,
+                "type": "preserve",
+                "name": "reserved fields",
+                "repeat": 4,
+                "repeatGroup": 0
+              },
+              {
+                "order": 13,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable forced discharge",
+                "tag": "fdOpen",
+                "fromBit": 0,
+                "endBit": 2
+              },
+              {
+                "order": 14,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Sunday",
+                "converter": "map(0:0, 1:1, 3:2, default:0)",
+                "tag": "fdSunEnable",
+                "same": true,
+                "fromBit": 2,
+                "endBit": 4
+              },
+              {
+                "order": 15,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Monday",
+                "tag": "fdMonEnable",
+                "converter": "map(0:0, 1:1, 3:2, default:0)",
+                "same": true,
+                "fromBit": 4,
+                "endBit": 6
+              },
+              {
+                "order": 16,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Tuesday",
+                "tag": "fdTusEnable",
+                "converter": "map(0:0, 1:1, 3:2, default:0)",
+                "same": true,
+                "fromBit": 6,
+                "endBit": 8
+              },
+              {
+                "order": 17,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Wednesday",
+                "tag": "fdWenEnable",
+                "converter": "map(0:0, 1:1, 3:2, default:0)",
+                "same": true,
+                "fromBit": 8,
+                "endBit": 10
+              },
+              {
+                "order": 18,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Thursday",
+                "tag": "fdThuEnable",
+                "converter": "map(0:0, 1:1, 3:2, default:0)",
+                "same": true,
+                "fromBit": 10,
+                "endBit": 12
+              },
+              {
+                "order": 19,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Friday",
+                "tag": "fdFriEnable",
+                "converter": "map(0:0, 1:1, 3:2, default:0)",
+                "same": true,
+                "fromBit": 12,
+                "endBit": 14
+              },
+              {
+                "order": 20,
+                "byteLen": 2,
+                "type": "bitRange",
+                "name": "Whether to enable Saturday",
+                "tag": "fdSatEnable",
+                "converter": "map(0:0, 1:1, 3:2, default:0)",
+                "same": true,
+                "fromBit": 14,
+                "endBit": 16
+              },
+              {
+                "order": 21,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Force charging soc upper limit",
+                "tag": "fdSocLimit"
+              },
+              {
+                "order": 22,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Forcibly rush the number of time periods in a day",
+                "tag": "fdTimeRangeLen"
+              },
+              {
+                "order": 23,
+                "byteLen": 2,
+                "type": "int",
+                "name": "start time",
+                "tag": "startTime",
+                "groupTag": "fdTimeGap",
+                "converter": "minToTime",
+                "repeat": 4,
+                "defaultValue": "00:00",
+                "repeatGroup": 1
+              },
+              {
+                "order": 24,
+                "byteLen": 2,
+                "type": "int",
+                "name": "End Time",
+                "tag": "endTime",
+                "groupTag": "fdTimeGap",
+                "converter": "minToTime",
+                "repeat": 4,
+                "repeatGroup": 1,
+                "defaultValue": "00:00"
+              },
+              {
+                "order": 25,
+                "byteLen": 2,
+                "type": "preserve",
+                "name": "reserved fields",
+                "repeat": 4,
+                "repeatGroup": 1
+              }
+            ]
+          },
+          {
+            "type": "A3",
+            "comment": "Local WIFI module network configuration",
+            "op": "3",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 1,
+                "type": "int",
+                "name": "IP acquisition type",
+                "tag": "getIpType",
+                "validate": "enum(1,2,0)"
+              },
+              {
+                "order": 1,
+                "byteLen": 20,
+                "type": "string",
+                "name": "ip",
+                "tag": "ip"
+              },
+              {
+                "order": 2,
+                "byteLen": 20,
+                "type": "string",
+                "name": "ipMask",
+                "tag": "ipMask"
+              },
+              {
+                "order": 3,
+                "byteLen": 20,
+                "type": "string",
+                "name": "ipGateway",
+                "tag": "ipGateway"
+              },
+              {
+                "order": 4,
+                "byteLen": 20,
+                "type": "preserve",
+                "name": "reserve"
+              }
+            ]
+          },
+          {
+            "type": "9D",
+            "comment": "Set parameter information 2",
+            "op": "1",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Meter detection function",
+                "tag": "meterMonitor",
+                "converter": "map(ee00:1, 00ee:2, default:0)"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Three-phase unbalanced output",
+                "tag": "threePhase",
+                "converter": "map(ee00:1, 00ee:2, default:0)"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "offGridSoc",
+                "name": "Off-grid SOC lower limit setting"
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "int",
+                "name": "In the micro grid mode the battery SOC hysteresis",
+                "tag": "socDiff"
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "int",
+                "name": "AC coupled PV source selection",
+                "tag": "pvSourceChoice"
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "backUpOrder",
+                "name": "Backup load power supply sequence"
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Whether bypass mode is enabled",
+                "tag": "sideWayEnable",
+                "converter": "map(ee00:1, 00ee:2, default:0)"
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "backup output function",
+                "tag": "backUpOutEnable",
+                "converter": "map(ee00:1, 00ee:2, default:0)"
+              },
+              {
+                "order": 8,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "cPowerLimit",
+                "name": "Charging power limit"
+              },
+              {
+                "order": 9,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "dPowerLimit",
+                "name": "Lower limit of discharge power"
+              },
+              {
+                "order": 10,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "batVolSettable",
+                "name": "Whether the battery voltage can be set",
+                "converter": "map(ee00:1, 00ee:2, default:0)"
+              },
+              {
+                "order": 11,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "batVolUpLimit",
+                "name": "battery voltage upper limit",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 12,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "batVolDownLimit",
+                "name": "battery voltage lower limit",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 13,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "shadowScan",
+                "name": "shadow scan",
+                "converter": "map(ee00:1, 00ee:2, default:0)"
+              },
+              {
+                "order": 14,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "batActive",
+                "name": "battery activated",
+                "converter": "map(ee00:1, 00ee:2, default:0)"
+              },
+              {
+                "order": 15,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "acidBatEqVol",
+                "name": "lead-acid battery charging voltage",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 16,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "acidBatFloatVol",
+                "name": "Lead-acid battery float charge voltage",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 17,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "acidBatEOD",
+                "name": "Lead-acid battery EOD",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 18,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "eSCCurUpLimit",
+                "name": "Mains charging current upper limit",
+                "unitType": "A",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 19,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "parallelType",
+                "name": "Parallel battery connection type"
+              },
+              {
+                "order": 20,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "parallelFlag",
+                "name": "Single parallel machine sign"
+              },
+              {
+                "order": 21,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "parallelAddr",
+                "name": "Parallel address"
+              },
+              {
+                "order": 22,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Battery power manual limiter",
+                "tag": "batPowerAdjustable",
+                "converter": "map(ee00:1, 00ee:2, default:0)"
+              }
+            ]
+          },
+          {
+            "type": "0B",
+            "comment": "Control cabinet information display",
+            "op": 1,
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "PV1 voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "int",
+                "name": "PV1 current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "name": "PV1 power",
+                "unitValue": "1",
+                "unitType": "W"
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "PV2 voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "int",
+                "name": "PV2 current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "int",
+                "name": "PV2 power",
+                "unitValue": "1",
+                "unitType": "W"
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Inverter A phase voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Inverter A phase current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 8,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Grid A phase voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 9,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Grid AB line voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 10,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Grid A phase current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 11,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Inverter B phase voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 12,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Inverter B phase current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 13,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Grid B phase voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 14,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Grid BC line voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 15,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Grid B phase current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 16,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Inverter C phase voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 17,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Inverter C phase current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 18,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "grid C phase voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 19,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Grid CA line voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 20,
+                "byteLen": 2,
+                "type": "int",
+                "name": "grid C phase current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 21,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "grid frequency",
+                "unitValue": "0.01",
+                "unitType": "HZ"
+              },
+              {
+                "order": 22,
+                "byteLen": 2,
+                "type": "int",
+                "name": "power factor",
+                "unitValue": "0.001"
+              },
+              {
+                "order": 23,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Grid active power",
+                "unitValue": "1",
+                "unitType": "W"
+              },
+              {
+                "order": 24,
+                "byteLen": 2,
+                "type": "int",
+                "name": "grid reactive power",
+                "unitValue": "1",
+                "unitType": "W"
+              },
+              {
+                "order": 25,
+                "byteLen": 2,
+                "type": "int",
+                "name": "grid apparent power",
+                "unitValue": "1",
+                "unitType": "Var"
+              },
+              {
+                "order": 26,
+                "byteLen": 2,
+                "type": "int",
+                "name": "battery current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 27,
+                "byteLen": 2,
+                "type": "int",
+                "name": "battery voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 28,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "DC positive bus voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 29,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "DC negative bus voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 30,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "DC bilateral bus voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 31,
+                "byteLen": 2,
+                "type": "int",
+                "name": "DC power",
+                "unitValue": "1",
+                "unitType": "W"
+              },
+              {
+                "order": 32,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "internal temperature",
+                "unitValue": "0.1",
+                "unitType": "℃"
+              },
+              {
+                "order": 33,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "10K: DC positive bus backup voltage 5/6K: Secondary bus 1",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 34,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "10K: DC negative bus backup voltage 5/6K: Secondary bus 2",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 35,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "device type code"
+              },
+              {
+                "order": 36,
+                "byteLen": 2,
+                "type": "uInt",
+                "tag": "dspHighVersion",
+                "name": "The high digit of the software version number"
+              },
+              {
+                "order": 37,
+                "byteLen": 2,
+                "type": "uInt",
+                "tag": "dspLowVersion",
+                "name": "The lower digit of the software version number"
+              },
+              {
+                "order": 38,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "Parallel address"
+              },
+              {
+                "order": 39,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "work efficiency"
+              },
+              {
+                "order": 40,
+                "byteLen": 2,
+                "type": "int",
+                "name": "battery current 1",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 41,
+                "byteLen": 2,
+                "type": "int",
+                "name": "battery current 2",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 42,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Module A1 temperature",
+                "unitValue": "0.1",
+                "unitType": "℃"
+              },
+              {
+                "order": 43,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Module B1 temperature",
+                "unitValue": "0.1",
+                "unitType": "℃"
+              },
+              {
+                "order": 44,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Module C1 temperature",
+                "unitValue": "0.1",
+                "unitType": "℃"
+              },
+              {
+                "order": 45,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "backup phase A voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 46,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "backup phase B voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 47,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "backup phase C voltage",
+                "unitValue": "0.1",
+                "unitType": "V"
+              },
+              {
+                "order": 48,
+                "byteLen": 2,
+                "type": "uInt",
+                "name": "backup voltage frequency",
+                "unitValue": "0.01",
+                "unitType": "HZ"
+              },
+              {
+                "order": 49,
+                "byteLen": 2,
+                "type": "int",
+                "name": "backup phase A current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 50,
+                "byteLen": 2,
+                "type": "int",
+                "name": "backup phase B current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 51,
+                "byteLen": 2,
+                "type": "int",
+                "name": "backup phase C current",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 52,
+                "byteLen": 2,
+                "type": "int",
+                "name": "backup power factor",
+                "unitValue": "0.001"
+              },
+              {
+                "order": 53,
+                "byteLen": 2,
+                "type": "int",
+                "name": "backup active power",
+                "unitValue": "1",
+                "unitType": "VA"
+              },
+              {
+                "order": 54,
+                "byteLen": 2,
+                "type": "int",
+                "name": "backup reactive power",
+                "unitValue": "1",
+                "unitType": "Var"
+              },
+              {
+                "order": 55,
+                "byteLen": 2,
+                "type": "int",
+                "name": "backup apparent power",
+                "unitValue": "1",
+                "unitType": "W"
+              },
+              {
+                "order": 56,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Inverter active power (parallel data)",
+                "unitValue": "0.01",
+                "unitType": "KW"
+              },
+              {
+                "order": 57,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Inverter reactive power (parallel data)",
+                "unitValue": "0.01",
+                "unitType": "KVar"
+              },
+              {
+                "order": 58,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Invert apparent power (parallel data)",
+                "unitValue": "0.01",
+                "unitType": "KW"
+              },
+              {
+                "order": 59,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Local load active power (parallel data)",
+                "unitValue": "0.01",
+                "unitType": "KW"
+              },
+              {
+                "order": 60,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Local load reactive power (parallel data)",
+                "unitValue": "0.01",
+                "unitType": "KVar"
+              },
+              {
+                "order": 61,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Local load apparent power (parallel data)",
+                "unitValue": "0.01",
+                "unitType": "KW"
+              },
+              {
+                "order": 62,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Local load phase A active power (parallel data)",
+                "unitValue": "0.01",
+                "unitType": "KW"
+              },
+              {
+                "order": 63,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Local load B-phase active power (parallel data)",
+                "unitValue": "0.01",
+                "unitType": "KW"
+              },
+              {
+                "order": 64,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Local load phase C active power (parallel data)",
+                "unitValue": "0.01",
+                "unitType": "KW"
+              },
+              {
+                "order": 65,
+                "byteLen": 2,
+                "type": "int",
+                "name": "PV total power (parallel data)",
+                "unitValue": "0.01",
+                "unitType": "KW"
+              },
+              {
+                "order": 66,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Total battery power (parallel data)",
+                "unitValue": "0.01",
+                "unitType": "KW"
+              },
+              {
+                "order": 67,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Total battery current (parallel data)",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 68,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Total battery charging current (parallel data)",
+                "unitValue": "0.1",
+                "unitType": "A"
+              },
+              {
+                "order": 69,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Total battery discharge current (parallel data)",
+                "unitValue": "0.1",
+                "unitType": "A"
+              }
+            ]
+          },
+          {
+            "type": "B0",
+            "comment": "Set up routers and servers",
+            "op": "3",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 1,
+                "type": "int",
+                "tag": "style",
+                "name": "WifiOperating mode",
+                "validate": "enum(0,1)"
+              },
+              {
+                "order": 1,
+                "byteLen": 30,
+                "type": "string",
+                "tag": "ssid",
+                "name": "router SSID",
+                "converter": "subZero",
+                "validate": "lenRange(1, 31)"
+              },
+              {
+                "order": 2,
+                "byteLen": 30,
+                "type": "string",
+                "tag": "password",
+                "name": "Router PASSWORD",
+                "converter": "subZero",
+                "validate": "lenRange(1, 31)"
+              },
+              {
+                "order": 3,
+                "byteLen": 20,
+                "type": "string",
+                "tag": "ip",
+                "name": "server IP",
+                "converter": "subZero",
+                "validate": "ip"
+              },
+              {
+                "order": 4,
+                "byteLen": 10,
+                "type": "string",
+                "tag": "port",
+                "converter": "subZero",
+                "name": "server port number"
+              }
+            ]
+          },
+          {
+            "type": "B1",
+            "comment": "Query routers and servers",
+            "op": "1",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 1,
+                "type": "int",
+                "tag": "style",
+                "name": "WifiOperating mode"
+              },
+              {
+                "order": 1,
+                "byteLen": 30,
+                "type": "string",
+                "tag": "ssid",
+                "name": "router SSID",
+                "converter": "subZero"
+              },
+              {
+                "order": 2,
+                "byteLen": 30,
+                "type": "string",
+                "tag": "password",
+                "name": "Router PASSWORD",
+                "converter": "subZero"
+              },
+              {
+                "order": 3,
+                "byteLen": 20,
+                "type": "string",
+                "tag": "ip",
+                "name": "server IP",
+                "converter": "subZero"
+              },
+              {
+                "order": 4,
+                "byteLen": 10,
+                "type": "string",
+                "tag": "port",
+                "converter": "subZero",
+                "name": "server port number"
+              }
+            ]
+          },
+          {
+            "type": "67",
+            "comment": "Working parameter setting 2",
+            "op": "2",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "powerFactor",
+                "name": "power factor setting",
+                "unitValue": "0.001"
+              },
+              {
+                "order": 1,
+                "byteLen": 14,
+                "type": "preserve",
+                "name": "reserve"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "version": 603,
+        "queryCommands": ["0C", "0A", "0B", "0D", "1E", "1F", "99", "95"],
+        "commands": [
+          {
+            "type": "6A",
+            "comment": "Operating mode setting 2",
+            "op": "2",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Meter detection function",
+                "tag": "meterMonitor",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Three-phase unbalanced output",
+                "tag": "threePhase",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "offGridSoc",
+                "name": "Off-grid SOC lower limit setting"
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "int",
+                "name": "In the micro grid mode the battery SOC hysteresis",
+                "tag": "socDiff"
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "int",
+                "name": "AC coupled PV source selection",
+                "tag": "pvSourceChoice",
+                "validate": "enum(0,1,2,3)"
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "backUpOrder",
+                "name": "Backup load power supply sequence",
+                "validate": "enum(0,1)"
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "int",
+                "name": "engine rated power",
+                "tag": "oilerRatedPower",
+                "unitType": "kW",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "backup output function",
+                "tag": "backUpOutEnable",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 8,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "cPowerLimit",
+                "name": "Charging power limit"
+              },
+              {
+                "order": 9,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "dPowerLimit",
+                "name": "Lower limit of discharge power"
+              },
+              {
+                "order": 10,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "batVolSettable",
+                "name": "Whether the battery voltage can be set",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 11,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "batVolUpLimit",
+                "name": "battery voltage upper limit",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 12,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "batVolDownLimit",
+                "name": "battery voltage lower limit",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 13,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "shadowScan",
+                "name": "shadow scan",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 14,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "batActive",
+                "name": "battery activated",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              },
+              {
+                "order": 15,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "acidBatEqVol",
+                "name": "lead-acid battery charging voltage",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 16,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "acidBatFloatVol",
+                "name": "Lead-acid battery float charge voltage",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 17,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "acidBatEOD",
+                "name": "Lead-acid battery EOD",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 18,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "eSCCurUpLimit",
+                "name": "Mains charging current upper limit",
+                "unitType": "A",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 19,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "parallelType",
+                "name": "Parallel battery connection type"
+              },
+              {
+                "order": 20,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "parallelFlag",
+                "name": "Single parallel machine sign"
+              },
+              {
+                "order": 21,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "parallelAddr",
+                "name": "Parallel address"
+              },
+              {
+                "order": 22,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Battery power manual limiter",
+                "tag": "batPowerAdjustable",
+                "converter": "map(1:ee00, 2:00ee, default:0000)",
+                "validate": "enumStr(ee00,00ee,0000)"
+              }
+            ]
+          },
+          {
+            "type": "9D",
+            "comment": "Set parameter information 2",
+            "op": "1",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Meter detection function",
+                "tag": "meterMonitor",
+                "converter": "map(ee00:1, 00ee:2, default:0)"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Three-phase unbalanced output",
+                "tag": "threePhase",
+                "converter": "map(ee00:1, 00ee:2, default:0)"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "offGridSoc",
+                "name": "Off-grid SOC lower limit setting"
+              },
+              {
+                "order": 3,
+                "byteLen": 2,
+                "type": "int",
+                "name": "In the micro grid mode the battery SOC hysteresis",
+                "tag": "socDiff"
+              },
+              {
+                "order": 4,
+                "byteLen": 2,
+                "type": "int",
+                "name": "AC coupled PV source selection",
+                "tag": "pvSourceChoice"
+              },
+              {
+                "order": 5,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "backUpOrder",
+                "name": "Backup load power supply sequence"
+              },
+              {
+                "order": 6,
+                "byteLen": 2,
+                "type": "int",
+                "name": "engine rated power",
+                "tag": "oilerRatedPower",
+                "unitType": "kW",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 7,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "backup output function",
+                "tag": "backUpOutEnable",
+                "converter": "map(ee00:1, 00ee:2, default:0)"
+              },
+              {
+                "order": 8,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "cPowerLimit",
+                "name": "Charging power limit"
+              },
+              {
+                "order": 9,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "dPowerLimit",
+                "name": "Lower limit of discharge power"
+              },
+              {
+                "order": 10,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "batVolSettable",
+                "name": "Whether the battery voltage can be set",
+                "converter": "map(ee00:1, 00ee:2, default:0)"
+              },
+              {
+                "order": 11,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "batVolUpLimit",
+                "name": "battery voltage upper limit",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 12,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "batVolDownLimit",
+                "name": "battery voltage lower limit",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 13,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "shadowScan",
+                "name": "shadow scan",
+                "converter": "map(ee00:1, 00ee:2, default:0)"
+              },
+              {
+                "order": 14,
+                "byteLen": 2,
+                "type": "hex",
+                "tag": "batActive",
+                "name": "battery activated",
+                "converter": "map(ee00:1, 00ee:2, default:0)"
+              },
+              {
+                "order": 15,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "acidBatEqVol",
+                "name": "lead-acid battery charging voltage",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 16,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "acidBatFloatVol",
+                "name": "Lead-acid battery float charge voltage",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 17,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "acidBatEOD",
+                "name": "Lead-acid battery EOD",
+                "unitType": "V",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 18,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "eSCCurUpLimit",
+                "name": "Mains charging current upper limit",
+                "unitType": "A",
+                "unitValue": "0.1"
+              },
+              {
+                "order": 19,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "parallelType",
+                "name": "Parallel battery connection type"
+              },
+              {
+                "order": 20,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "parallelFlag",
+                "name": "Single parallel machine sign"
+              },
+              {
+                "order": 21,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "parallelAddr",
+                "name": "Parallel address"
+              },
+              {
+                "order": 22,
+                "byteLen": 2,
+                "type": "hex",
+                "name": "Battery power manual limiter",
+                "tag": "batPowerAdjustable",
+                "converter": "map(ee00:1, 00ee:2, default:0)"
+              }
+            ]
+          },
+          {
+            "type": "BA",
+            "comment": "Register settings",
+            "op": "2",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "regCount",
+                "name": "Subsequent setting of the number of registers (maximum 10)"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "uInt",
+                "tag": "address",
+                "repeatRef": 0,
+                "repeatGroup": 0,
+                "groupTag": "regs",
+                "name": "register address"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "value",
+                "repeatRef": 0,
+                "repeatGroup": 0,
+                "groupTag": "regs",
+                "name": "register value"
+              }
+            ]
+          },
+          {
+            "type": "BB",
+            "comment": "Register query",
+            "op": "1",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "regCount",
+                "name": "The number of registers to be queried (up to 10)"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "uInt",
+                "tag": "address",
+                "repeatRef": 0,
+                "repeatGroup": 0,
+                "groupTag": "regs",
+                "name": "register address"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "tag": "value",
+                "repeatRef": 0,
+                "repeatGroup": 0,
+                "groupTag": "regs",
+                "name": "register value"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+
+  "osim-upgrade": {
+    "id": "pcu",
+    "name": "Optical storage all-in-one machine protocol pcu upgrade protocol",
+    "versions" : [
+      {
+        "version": 0,
+        "commands": [
+          {
+            "type": "0000",
+            "comment": "upgrade result",
+            "op": "1",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "hex",
+                "byteOrder": 1,
+                "name": "upgrade result"
+              }
+            ]
+          },
+          {
+            "type": "1000",
+            "comment": "Upgrade DSP program",
+            "op": "2",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 4,
+                "type": "bytes",
+                "byteOrder": 1,
+                "name": "Fixed content in bin"
+              }
+            ]
+          },
+          {
+            "type": "E000",
+            "comment": "run DSP program",
+            "op": "2",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 4,
+                "type": "bytes",
+                "byteOrder": 1,
+                "name": "main function address"
+              },
+              {
+                "order": 1,
+                "byteLen": 4,
+                "type": "int",
+                "byteOrder": 1,
+                "name": "Upgraded Application Length"
+              },
+              {
+                "order": 2,
+                "byteLen": 2,
+                "type": "int",
+                "name": "Upgraded application CRC"
+              }
+            ]
+          },
+          {
+            "type": "2000",
+            "comment": "Upgrade PCU program",
+            "op": "2",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "hex",
+                "byteOrder": 1,
+                "name": "Fixed content 0000"
+              }
+            ]
+          },
+          {
+            "type": "F000",
+            "comment": "Run the PCU program",
+            "op": "2",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 2,
+                "type": "int",
+                "byteOrder": 1,
+                "name": "Upgraded Application Length"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "int",
+                "byteOrder": 1,
+                "name": "Upgraded application CRC"
+              }
+            ]
+          },
+          {
+            "type": "0001",
+            "comment": "upgrade data",
+            "op": "2",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 0,
+                "type": "bytes",
+                "name": "part of data"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "version": 400,
+        "commands": [
+          {
+            "type": "F000",
+            "comment": "Run the PCU program",
+            "op": "2",
+            "fields": [
+              {
+                "order": 0,
+                "byteLen": 4,
+                "type": "long",
+                "byteOrder": 2,
+                "name": "Upgraded Application Length"
+              },
+              {
+                "order": 1,
+                "byteLen": 2,
+                "type": "int",
+                "byteOrder": 1,
+                "name": "Upgraded application CRC"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

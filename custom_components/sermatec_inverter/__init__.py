@@ -8,7 +8,7 @@ from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
 
-from sermatec_inverter import Sermatec
+from .sermatec_inverter import Sermatec
 
 PLATFORMS: list[Platform] = [Platform.SENSOR]
 _LOGGER = logging.getLogger(__name__)
@@ -27,7 +27,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     
     # Storing an API to use by platforms.
     hass.data[DOMAIN][entry.entry_id] = Sermatec(
-        _LOGGER,
         entry.data['host'],
         entry.data['port']
     )
