@@ -51,24 +51,41 @@ async def async_setup_entry(
     
     # await coordinator.async_config_entry_first_refresh()
     serial_number = config_entry.data["serial"]
-
-    if not await smc_api.connect():
+    
+    for i in range(3):
+        connection_status = await smc_api.connect()
+        if connection_status:
+            break
+    
+    if not connection_status:
         raise ConfigEntryNotReady("Timeout setting up inverter!")
 
-    data : dict = await smc_api.get("systemInformation")
-    
-    sensors = []
-    for sensor_key in data:
-        sensors.append(
+    available_sensors = await smc_api.listSensors()
+
+    hass_sensors = []
+    for key, val in available_sensors.items():
+        if "device_class" in val:
+            sensor_device_class = val["device_class"]
+        else:
+            sensor_device_class = ""
+        
+        if "unit" in val:
+            sensor_unit = val["unit"]
+        else:
+            sensor_unit = ""
+
+        hass_sensors.append(
             SermatecSensor(
                 coordinator,
                 serial_number,
-                sensor_key,
-                sensor_key
+                dict_key=key,
+                name=key,
+                device_class=sensor_device_class,
+                unit=sensor_unit
             )
         )
 
-    async_add_entities(sensors, True)
+    async_add_entities(hass_sensors, True)
 
    
 class SermatecCoordinator(DataUpdateCoordinator):
