@@ -93,8 +93,23 @@ async def getFunc(**kwargs):
 async def setFunc(**kwargs):
     pass
 
-if __name__ == "__main__":
+async def listFunc(**kwargs):
+    smc = Sermatec(kwargs["ip"], kwargs["port"], kwargs["protocolFilePath"])
+    print(f"Connecting to Sermatec at {kwargs['ip']}:{kwargs['port']}...", end = "")
+    if await smc.connect():
+        print("OK")
+    else:
+        print("Can't connect.")
+        return
 
+    if kwargs["type"] == "sensors":
+        print(await smc.listSensors())
+    
+    print("Disconnecting...", end = "")
+    await smc.disconnect()
+    print("OK")
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog = "sermatec_inverter",
         description = "Sermatec Inverter communication script.",
@@ -117,6 +132,14 @@ if __name__ == "__main__":
 
     setParser = subparsers.add_parser("set", help = "Configure a value in the inverter.")
     setParser.set_defaults(cmdFunc = setFunc)
+
+    listParser = subparsers.add_parser("list", help = "List supported sensors and other features.")
+    listParser.set_defaults(cmdFunc = listFunc)
+    listParser.add_argument(
+        "type",
+        help = "What type of features to list.",
+        choices = ["sensors", "buttons"]
+    )
 
     customgetParser = subparsers.add_parser("customget", help = "Query the inverter using custom command.")
     customgetParser.set_defaults(cmdFunc = customgetFunc)

@@ -374,7 +374,7 @@
                 "type": "int",
                 "name": "grid apparent power",
                 "unitValue": "1",
-                "unitType": "Var"
+                "unitType": "var"
               },
               {
                 "order": 26,
@@ -597,7 +597,7 @@
                 "type": "int",
                 "name": "backup reactive power",
                 "unitValue": "1",
-                "unitType": "Var"
+                "unitType": "var"
               },
               {
                 "order": 55,
@@ -3776,7 +3776,7 @@
                 "type": "int",
                 "name": "grid apparent power",
                 "unitValue": "1",
-                "unitType": "Var"
+                "unitType": "var"
               },
               {
                 "order": 26,
@@ -3999,7 +3999,7 @@
                 "type": "int",
                 "name": "backup reactive power",
                 "unitValue": "1",
-                "unitType": "Var"
+                "unitType": "var"
               },
               {
                 "order": 55,

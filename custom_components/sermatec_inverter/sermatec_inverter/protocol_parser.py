@@ -26,6 +26,8 @@ class SermatecProtocolParser:
         "bmsStatus"           : 0x0d
     }
 
+    ALL_QUERY_COMMANDS = [0x98, 0x0a, 0x0b, 0x0c, 0x95, 0x0d]
+
     def __parseBatteryStatus(self, value : int) -> str:
         if value == 0x0011:
             return "charging"
@@ -128,7 +130,7 @@ class SermatecProtocolParser:
             return 0
         
 
-    def parseReply(self, command : int, version : int, reply : bytes) -> dict:
+    def parseReply(self, command : int, version : int, reply : bytes, dryrun : bool = False) -> dict:
         """Parse a command reply using a specified version definition.
 
         Args:
@@ -217,48 +219,68 @@ class SermatecProtocolParser:
                 fieldMultiplier : float = 1
                 logger.debug(f"Field {fieldName} has not 'unitValue' key, using 1 as a default multiplier.")          
             
-            currentFieldData = reply[ replyPosition : (replyPosition + fieldLength) ]
-            logger.debug(f"Parsing field data: {currentFieldData.hex(' ')}")
+            newField = {}
 
-            newField : dict = {}
-            
             if "unitType" in field:
                 logger.debug(f"Field has a unit: {field['unitType']}")
                 newField["unit"] = field['unitType']
 
-            if fieldType == "int":
-                newField["value"] = round(int.from_bytes(currentFieldData, byteorder = "big", signed = True) * fieldMultiplier, self.__getMultiplierDecimalPlaces(fieldMultiplier))
-            elif fieldType == "uInt":
-                newField["value"] = round(int.from_bytes(currentFieldData, byteorder = "big", signed = False) * fieldMultiplier, self.__getMultiplierDecimalPlaces(fieldMultiplier))
-            elif fieldType == "string":
-                # The string is null-terminated, trimming everything after first occurence of '\0'.
-                trimmedString = currentFieldData.split(b"\x00", 1)[0]
-                newField["value"] = trimmedString.decode('ascii')
-            elif fieldType == "bit":
-                binString : str = bin(int.from_bytes(currentFieldData, byteorder = "little", signed = False)).removeprefix("0b")
-                newField["value"] = int(binString[fieldBitPosition])
-            elif fieldType == "bitRange":
-                binString : str = bin(int.from_bytes(currentFieldData, byteorder = "little", signed = False)).removeprefix("0b")
-                newField["value"] = binString[fieldFromBit:fieldEndBit]
-            elif fieldType == "hex":
-                newField["value"] = currentFieldData.hex()
-            elif fieldType == "preserve":
-                ignoreField = True
-            elif fieldType == "long":
-                newField["value"] = round(int.from_bytes(currentFieldData, byteorder = "big", signed = True) * fieldMultiplier, self.__getMultiplierDecimalPlaces(fieldMultiplier))
-            else:
-                ignoreField = True
-                logger.warning(f"The provided field is of an unsuported type '{fieldType}'. Please contact developer.")
+                if newField["unit"] == "V":
+                    newField["device_class"] = "VOLTAGE"
+                elif newField["unit"] == "W":
+                    newField["device_class"] = "POWER"
+                elif newField["unit"] == "VA":
+                    newField["device_class"] = "APPARENT_POWER"
+                elif newField["unit"] == "A":
+                    newField["device_class"] = "CURRENT"
+                elif newField["unit"] == "var":
+                    newField["device_class"] = "REACTIVE_POWER"
+                elif newField["unit"] == "°C":
+                    newField["device_class"] = "TEMPERATURE"
+                elif newField["unit"] == "Hz":
+                    newField["device_class"] = "FREQUENCY"
+                                  
+            # Do not parse when no data are supplied (dry run) -> checking out list of available sensors,
+            # useful e.g. for Home Assistant.
+            if not dryrun:
+                currentFieldData = reply[ replyPosition : (replyPosition + fieldLength) ]
+                logger.debug(f"Parsing field data: {currentFieldData.hex(' ')}")
 
-            # Some field have a meaning encoded to integers: trying to parse.
-            if "parser" in field and field["parser"] in self.FIELD_PARSERS:
-                logger.debug("This field has an explicit parser available, parsing.")
-                newField["value"] = self.FIELD_PARSERS[field["parser"]](self, newField["value"])
+                newField : dict = {}
+                
+                if fieldType == "int":
+                    newField["value"] = round(int.from_bytes(currentFieldData, byteorder = "big", signed = True) * fieldMultiplier, self.__getMultiplierDecimalPlaces(fieldMultiplier))
+                elif fieldType == "uInt":
+                    newField["value"] = round(int.from_bytes(currentFieldData, byteorder = "big", signed = False) * fieldMultiplier, self.__getMultiplierDecimalPlaces(fieldMultiplier))
+                elif fieldType == "string":
+                    # The string is null-terminated, trimming everything after first occurence of '\0'.
+                    trimmedString = currentFieldData.split(b"\x00", 1)[0]
+                    newField["value"] = trimmedString.decode('ascii')
+                elif fieldType == "bit":
+                    binString : str = bin(int.from_bytes(currentFieldData, byteorder = "little", signed = False)).removeprefix("0b")
+                    newField["value"] = int(binString[fieldBitPosition])
+                elif fieldType == "bitRange":
+                    binString : str = bin(int.from_bytes(currentFieldData, byteorder = "little", signed = False)).removeprefix("0b")
+                    newField["value"] = binString[fieldFromBit:fieldEndBit]
+                elif fieldType == "hex":
+                    newField["value"] = currentFieldData.hex()
+                elif fieldType == "preserve":
+                    ignoreField = True
+                elif fieldType == "long":
+                    newField["value"] = round(int.from_bytes(currentFieldData, byteorder = "big", signed = True) * fieldMultiplier, self.__getMultiplierDecimalPlaces(fieldMultiplier))
+                else:
+                    ignoreField = True
+                    logger.warning(f"The provided field is of an unsuported type '{fieldType}'. Please contact developer.")
 
-            # On some fields the parse key is missing, so using names for identification.
-            if fieldTag in self.NAME_BASED_FIELD_PARSERS:
-                logger.debug("This field has an name-based parser available, parsing.")
-                newField["value"] = self.NAME_BASED_FIELD_PARSERS[fieldTag](self, newField["value"])
+                # Some field have a meaning encoded to integers: trying to parse.
+                if "parser" in field and field["parser"] in self.FIELD_PARSERS:
+                    logger.debug("This field has an explicit parser available, parsing.")
+                    newField["value"] = self.FIELD_PARSERS[field["parser"]](self, newField["value"])
+
+                # On some fields the parse key is missing, so using names for identification.
+                if fieldTag in self.NAME_BASED_FIELD_PARSERS:
+                    logger.debug("This field has an name-based parser available, parsing.")
+                    newField["value"] = self.NAME_BASED_FIELD_PARSERS[fieldTag](self, newField["value"])
 
             if not ignoreField:
                 parsedData[fieldTag] = newField
