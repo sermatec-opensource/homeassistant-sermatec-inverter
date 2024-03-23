@@ -16,7 +16,7 @@ from homeassistant.helpers.update_coordinator import (
     UpdateFailed,
     ConfigEntryNotReady
 )
-from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
+from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity, SensorDeviceClass
 import homeassistant.helpers.config_validation as cv
 from homeassistant.const import (
     CONF_IP_ADDRESS,
@@ -25,6 +25,7 @@ from homeassistant.const import (
 
 # API module.
 from .sermatec_inverter import Sermatec
+from .sermatec_inverter.exceptions import *
 
 # Constants.
 from .const import DOMAIN
@@ -39,6 +40,12 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     }
 )
 
+def _smc_convert_device_class(device_class : str | None):
+    if device_class:
+        return SensorDeviceClass[device_class]
+    else:
+        return None
+
 # Set up the sensor platform from a config entry.
 async def async_setup_entry(
     hass                : HomeAssistant,
@@ -49,30 +56,20 @@ async def async_setup_entry(
     smc_api = hass.data[DOMAIN][config_entry.entry_id]
     coordinator = SermatecCoordinator(hass, smc_api)
     
-    # await coordinator.async_config_entry_first_refresh()
     serial_number = config_entry.data["serial"]
     
-    for i in range(3):
-        connection_status = await smc_api.connect()
-        if connection_status:
-            break
-    
-    if not connection_status:
-        raise ConfigEntryNotReady("Timeout setting up inverter!")
-
-    available_sensors = await smc_api.listSensors()
-
+    available_sensors = smc_api.listSensors(pcuVersion=411)
     hass_sensors = []
     for key, val in available_sensors.items():
         if "device_class" in val:
             sensor_device_class = val["device_class"]
         else:
-            sensor_device_class = ""
+            sensor_device_class = None
         
         if "unit" in val:
             sensor_unit = val["unit"]
         else:
-            sensor_unit = ""
+            sensor_unit = None
 
         hass_sensors.append(
             SermatecSensor(
@@ -80,11 +77,14 @@ async def async_setup_entry(
                 serial_number,
                 dict_key=key,
                 name=key,
-                device_class=sensor_device_class,
+                device_class=_smc_convert_device_class(sensor_device_class),
                 unit=sensor_unit
             )
         )
+    
+    # TODO: add special sensors manally
 
+    # await coordinator.async_config_entry_first_refresh()
     async_add_entities(hass_sensors, True)
 
    
@@ -104,6 +104,7 @@ class SermatecCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Fetch data from inverter."""
 
+        _LOGGER.info("fetching")
         retries : int = 3
         while not await self.smc_api.connect() and retries > 0:
             await asyncio.sleep(0.5)
@@ -112,11 +113,30 @@ class SermatecCoordinator(DataUpdateCoordinator):
         if not self.smc_api.isConnected():
             raise UpdateFailed(f"Can't connect to the inverter.")
 
+        query_cmds = self.smc_api.getQueryCommands()
+        coordinator_data = {}
+        # Here we don't attempt to retry -- the API script has
+        # retry mechanism built-in.
+        for cmd in query_cmds:
+            try:
+                response = await self.smc_api.getCustom(cmd)
+            except (NoDataReceived, FailedResponseIntegrityCheck):
+                pass
+            except NotConnected:
+                await asyncio.sleep(0.5)
+                await self.smc_api.connect()
+            else:
+                coordinator_data.update(response)
+
         await self.smc_api.disconnect()
 
-        return {
-            "serial": ":)"
-        }
+        if not coordinator_data:
+            raise UpdateFailed(f"Can't update any values.")
+
+        return coordinator_data
+    
+    async def async_config_entry_first_refresh(self) -> None:
+        return
 
 class SermatecSensorBase(CoordinatorEntity, SensorEntity):
     """Standard Sermatec Inverter sensor."""
@@ -153,7 +173,11 @@ class SermatecSensor(SermatecSensorBase):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        self._attr_native_value = self.coordinator.data[self.dict_key]
+        if self.coordinator.data and self.dict_key in self.coordinator.data:
+            self._attr_native_value = self.coordinator.data[self.dict_key]["value"]
+            self._attr_available = True
+        else:
+            self._attr_available = False
         self.async_write_ha_state()
 
 class SermatecSerialSensor(SermatecSensorBase):
