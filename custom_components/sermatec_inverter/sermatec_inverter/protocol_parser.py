@@ -88,7 +88,10 @@ class SermatecProtocolParser:
             raise CommandNotFoundInProtocol()
 
     # Get all available query commands in the specified version.
+    # TODO: Use queryCommands from protocol.json instead of hardcoded array.
     def getQueryCommands(self, version : int) -> list:
+        return self.ALL_QUERY_COMMANDS
+
         cmds = set()
         for ver in self.osim["versions"]:
             cmds |= {int(cmd, base=16) for cmd in ver["queryCommands"] if ver["version"] <= version}

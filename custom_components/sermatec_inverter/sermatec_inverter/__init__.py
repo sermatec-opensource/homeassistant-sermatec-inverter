@@ -8,9 +8,9 @@ _LOGGER = logging.getLogger(__name__)
 
 class Sermatec:
 
-    QUERY_WRITE_TIMEOUT     = 10
-    QUERY_READ_TIMEOUT      = 20
-    QUERY_ATTEMPTS          = 3
+    QUERY_WRITE_TIMEOUT     = 5
+    QUERY_READ_TIMEOUT      = 5
+    QUERY_ATTEMPTS          = 5
 
     def __init__(self, host : str, port : int, protocolFilePath : str = None):
         if not protocolFilePath:
@@ -114,18 +114,23 @@ class Sermatec:
 # PCU version!
 # This is useful for Home Assistant integration.
 # ========================================================================
-    async def listSensors(self) -> dict:
-        if not self.isConnected():
-            _LOGGER.error("Can't list sensors: not connected.")
-            raise NotConnected()
+    def listSensors(self, pcuVersion : int = None) -> dict:
+        # If no specific pcuVersion specified, use (possibly) previously discovered.
+        if not pcuVersion:
+            pcuVersion = self.pcuVersion
         
         sensorList : dict = {}
-        # TODO: Use queryCommands from protocol.json instead of hardcoded array.
-        for cmd in self.parser.ALL_QUERY_COMMANDS:
-            sensorList.update(self.parser.parseReply(cmd, self.pcuVersion, bytearray(), dryrun=True))
+        for cmd in self.parser.getQueryCommands(pcuVersion):
+            sensorList.update(self.parser.parseReply(cmd, pcuVersion, bytearray(), dryrun=True))
 
         return sensorList
-
+    
+    def getQueryCommands(self, pcuVersion : int = None) -> dict:
+        # If no specific pcuVersion specified, use (possibly) previously discovered.
+        if not pcuVersion:
+            pcuVersion = self.pcuVersion
+        
+        return self.parser.getQueryCommands(pcuVersion)
 # ========================================================================
 # Query methods
 # ========================================================================   
