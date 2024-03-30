@@ -102,11 +102,38 @@ async def async_setup_entry(
             device_class    = "power",
             unit            = "W"
         ),
+        SermatecBatteryDischargingPowerSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_power_key  = "dc_power",
+            dict_status_key = "charge_and_discharge_status",
+            name            = "Battery discharging power",
+            id              = "battery_discharging_power",
+            device_class    = "power",
+            unit            = "W"
+        ),
+        SermatecBatteryChargingPowerSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_power_key  = "dc_power",
+            dict_status_key = "charge_and_discharge_status",
+            name            = "Battery charging power",
+            id              = "battery_charging_power",
+            device_class    = "power",
+            unit            = "W"
+        ),
+        SermatecSumSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key_1      = "pv1_power",
+            dict_key_2      = "pv2_power",
+            name            = "PV total power",
+            id              = "pv_total_power",
+            device_class    = "power",
+            unit            = "W"  
+        )
     ])
-    
-    # TODO: add special sensors manally
 
-    # await coordinator.async_config_entry_first_refresh()
     async_add_entities(hass_sensors, True)
 
    
@@ -257,38 +284,6 @@ class SermatecNegativeSensor(SermatecSensor):
             self._attr_available = False
         self.async_write_ha_state()
 
-class SermatecPositivePowerSensor(SermatecSensor):
-    """
-    Special Sermatec sensor for calculating power from voltage
-    and current and tracking only positive value.
-    """
-
-    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
-        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
-
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle data from the coordinator."""
-        data = self.coordinator.data[self.dict_key["voltage"]] * self.coordinator.data[self.dict_key["current"]]
-        self._attr_native_value = data if data > 0 else 0
-        self.async_write_ha_state()
-
-class SermatecNegativePowerSensor(SermatecSensor):
-    """
-    Special Sermatec sensor for calculating power from voltage
-    and current and tracking only positive value.
-    """
-
-    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
-        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
-
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle data from the coordinator."""
-        data = self.coordinator.data[self.dict_key["voltage"]] * self.coordinator.data[self.dict_key["current"]]
-        self._attr_native_value = abs(data) if data < 0 else 0
-        self.async_write_ha_state()
-
 class SermatecBatteryChargingPowerSensor(SermatecSensor):
     """
     Special Sermatec sensor for battery charging power from current and voltage,
@@ -297,14 +292,20 @@ class SermatecBatteryChargingPowerSensor(SermatecSensor):
     ref: https://community.home-assistant.io/t/howto-fronius-integration-with-battery-into-energy-dashboard/376329
     """
 
-    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
-        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
+    def __init__(self, coordinator, serial_number, dict_power_key, dict_status_key, name, id = None, device_class = None, unit = None):
+        super().__init__(coordinator, serial_number, None, name, id, device_class, unit)
+        self.dict_power_key  = dict_power_key
+        self.dict_status_key = dict_status_key
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        data = self.coordinator.data[self.dict_key["voltage"]] * self.coordinator.data[self.dict_key["current"]] if self.coordinator.data["battery_state"] == "charging" else 0
-        self._attr_native_value = abs(data)
+        if self.coordinator.data and self.dict_power_key in self.coordinator.data and self.dict_status_key in self.coordinator.data:
+            data = self.coordinator.data[self.dict_power_key]["value"] if self.coordinator.data[self.dict_status_key] == "charging" else 0
+            self._attr_native_value = abs(data)
+            self._attr_available = True
+        else:
+            self._attr_available = False
         self.async_write_ha_state()
 
 class SermatecBatteryDischargingPowerSensor(SermatecSensor):
@@ -315,26 +316,37 @@ class SermatecBatteryDischargingPowerSensor(SermatecSensor):
     ref: https://community.home-assistant.io/t/howto-fronius-integration-with-battery-into-energy-dashboard/376329
     """
 
-    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
-        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
+    def __init__(self, coordinator, serial_number, dict_power_key, dict_status_key, name, id = None, device_class = None, unit = None):
+        super().__init__(coordinator, serial_number, None, name, id, device_class, unit)
+        self.dict_power_key  = dict_power_key
+        self.dict_status_key = dict_status_key
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        data = self.coordinator.data[self.dict_key["voltage"]] * self.coordinator.data[self.dict_key["current"]] if self.coordinator.data["battery_state"] == "discharging" else 0
-        self._attr_native_value = abs(data)
+        if self.coordinator.data and self.dict_power_key in self.coordinator.data and self.dict_status_key in self.coordinator.data:
+            data = self.coordinator.data[self.dict_power_key]["value"] if self.coordinator.data[self.dict_status_key] == "discharging" else 0
+            self._attr_native_value = abs(data)
+            self._attr_available = True
+        else:
+            self._attr_available = False
         self.async_write_ha_state()
 
-class SermatecPVTotalPowerSensor(SermatecSensor):
+class SermatecSumSensor(SermatecSensor):
     """
     Special Sermatec sensor for calculating total PV power.
     """
-
-    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
-        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
+    def __init__(self, coordinator, serial_number, dict_key_1, dict_key_2, name, id = None, device_class = None, unit = None):
+        super().__init__(coordinator, serial_number, None, name, id, device_class, unit)
+        self.dict_key_1 = dict_key_1
+        self.dict_key_2 = dict_key_2
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        self._attr_native_value = self.coordinator.data[self.dict_key["pv1"]] + self.coordinator.data[self.dict_key["pv2"]]
+        if self.coordinator.data and self.dict_key_1 in self.coordinator.data and self.dict_key_2 in self.coordinator.data:
+            self._attr_native_value = self.coordinator.data[self.dict_key_1]["value"] + self.coordinator.data[self.dict_key_2]["value"]
+            self._attr_available = True
+        else:
+            self._attr_available = False
         self.async_write_ha_state()
