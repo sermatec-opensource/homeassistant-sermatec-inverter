@@ -318,7 +318,7 @@ class SermatecBatteryChargingPowerSensor(SermatecSensor):
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
         if self.coordinator.data and self.dict_power_key in self.coordinator.data and self.dict_status_key in self.coordinator.data:
-            data = self.coordinator.data[self.dict_power_key]["value"] if self.coordinator.data[self.dict_status_key] == "charging" else 0
+            data = self.coordinator.data[self.dict_power_key]["value"] if self.coordinator.data[self.dict_status_key]["value"] == "charging" else 0
             self._attr_native_value = abs(data)
             self._attr_available = True
         else:
@@ -342,7 +342,7 @@ class SermatecBatteryDischargingPowerSensor(SermatecSensor):
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
         if self.coordinator.data and self.dict_power_key in self.coordinator.data and self.dict_status_key in self.coordinator.data:
-            data = self.coordinator.data[self.dict_power_key]["value"] if self.coordinator.data[self.dict_status_key] == "discharging" else 0
+            data = self.coordinator.data[self.dict_power_key]["value"] if self.coordinator.data[self.dict_status_key]["value"] == "discharging" else 0
             self._attr_native_value = abs(data)
             self._attr_available = True
         else:
