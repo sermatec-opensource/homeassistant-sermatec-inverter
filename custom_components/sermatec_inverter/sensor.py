@@ -66,7 +66,7 @@ async def async_setup_entry(
     elif smc_api.pcuVersion == 0:
         raise ConfigEntryNotReady(f"Inverted did not return version.")
 
-    smc_api.disconnect()
+    await smc_api.disconnect()
 
     coordinator = SermatecCoordinator(hass, smc_api, smc_api.pcuVersion)
     
