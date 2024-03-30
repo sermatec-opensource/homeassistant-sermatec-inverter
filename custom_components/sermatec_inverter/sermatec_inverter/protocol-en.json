@@ -79,19 +79,23 @@
                 "type": "int",
                 "name": "battery temperature",
                 "unitValue": "0.1",
-                "unitType": "C"
+                "unitType": "°C"
               },
               {
                 "order": 3,
                 "byteLen": 2,
                 "type": "uInt",
-                "name": "battery soc"
+                "name": "battery soc",
+                "unitType": "%",
+                "deviceClass": "BATTERY"
               },
               {
                 "order": 4,
                 "byteLen": 2,
                 "type": "int",
-                "name": "battery soh"
+                "name": "battery soh",
+                "unitType": "%",
+                "deviceClass": "BATTERY"
               },
               {
                 "order": 5,
@@ -343,14 +347,15 @@
                 "type": "uInt",
                 "name": "grid frequency",
                 "unitValue": "0.01",
-                "unitType": "HZ"
+                "unitType": "Hz"
               },
               {
                 "order": 22,
                 "byteLen": 2,
                 "type": "int",
                 "name": "power factor",
-                "unitValue": "0.001"
+                "unitValue": "0.001",
+                "deviceClass": "POWER_FACTOR"
               },
               {
                 "order": 23,
@@ -430,7 +435,7 @@
                 "type": "uInt",
                 "name": "internal temperature",
                 "unitValue": "0.1",
-                "unitType": "℃"
+                "unitType": "°C"
               },
               {
                 "order": 33,
@@ -478,7 +483,8 @@
                 "order": 39,
                 "byteLen": 2,
                 "type": "uInt",
-                "name": "work efficiency"
+                "name": "work efficiency",
+                "unitType": "%"
               },
               {
                 "order": 40,
@@ -502,7 +508,7 @@
                 "type": "int",
                 "name": "Module A1 temperature",
                 "unitValue": "0.1",
-                "unitType": "℃"
+                "unitType": "°C"
               },
               {
                 "order": 43,
@@ -510,7 +516,7 @@
                 "type": "int",
                 "name": "Module B1 temperature",
                 "unitValue": "0.1",
-                "unitType": "℃"
+                "unitType": "°C"
               },
               {
                 "order": 44,
@@ -518,7 +524,7 @@
                 "type": "int",
                 "name": "Module C1 temperature",
                 "unitValue": "0.1",
-                "unitType": "℃"
+                "unitType": "°C"
               },
               {
                 "order": 45,
@@ -550,7 +556,7 @@
                 "type": "uInt",
                 "name": "backup voltage frequency",
                 "unitValue": "0.01",
-                "unitType": "HZ"
+                "unitType": "Hz"
               },
               {
                 "order": 49,
@@ -1822,6 +1828,7 @@
                 "order": 2,
                 "byteLen": 2,
                 "type": "int",
+                "unitType": "W",
                 "name": "remote load"
               }
             ]
@@ -1940,6 +1947,7 @@
                 "order": 6,
                 "byteLen": 2,
                 "type": "int",
+                "unitType": "W",
                 "name": "remote load"
               }
             ]
@@ -3745,7 +3753,7 @@
                 "type": "uInt",
                 "name": "grid frequency",
                 "unitValue": "0.01",
-                "unitType": "HZ"
+                "unitType": "Hz"
               },
               {
                 "order": 22,
@@ -3832,7 +3840,7 @@
                 "type": "uInt",
                 "name": "internal temperature",
                 "unitValue": "0.1",
-                "unitType": "℃"
+                "unitType": "°C"
               },
               {
                 "order": 33,
@@ -3880,7 +3888,8 @@
                 "order": 39,
                 "byteLen": 2,
                 "type": "uInt",
-                "name": "work efficiency"
+                "name": "work efficiency",
+                "unitType": "%"
               },
               {
                 "order": 40,
@@ -3904,7 +3913,7 @@
                 "type": "int",
                 "name": "Module A1 temperature",
                 "unitValue": "0.1",
-                "unitType": "℃"
+                "unitType": "°C"
               },
               {
                 "order": 43,
@@ -3912,7 +3921,7 @@
                 "type": "int",
                 "name": "Module B1 temperature",
                 "unitValue": "0.1",
-                "unitType": "℃"
+                "unitType": "°C"
               },
               {
                 "order": 44,
@@ -3920,7 +3929,7 @@
                 "type": "int",
                 "name": "Module C1 temperature",
                 "unitValue": "0.1",
-                "unitType": "℃"
+                "unitType": "°C"
               },
               {
                 "order": 45,
@@ -3952,7 +3961,7 @@
                 "type": "uInt",
                 "name": "backup voltage frequency",
                 "unitValue": "0.01",
-                "unitType": "HZ"
+                "unitType": "Hz"
               },
               {
                 "order": 49,
@@ -4015,7 +4024,7 @@
                 "type": "int",
                 "name": "Inverter active power (parallel data)",
                 "unitValue": "0.01",
-                "unitType": "KW"
+                "unitType": "kW"
               },
               {
                 "order": 57,
@@ -4031,7 +4040,7 @@
                 "type": "int",
                 "name": "Invert apparent power (parallel data)",
                 "unitValue": "0.01",
-                "unitType": "KW"
+                "unitType": "kW"
               },
               {
                 "order": 59,
@@ -4039,7 +4048,7 @@
                 "type": "int",
                 "name": "Local load active power (parallel data)",
                 "unitValue": "0.01",
-                "unitType": "KW"
+                "unitType": "kW"
               },
               {
                 "order": 60,
@@ -4055,7 +4064,7 @@
                 "type": "int",
                 "name": "Local load apparent power (parallel data)",
                 "unitValue": "0.01",
-                "unitType": "KW"
+                "unitType": "kW"
               },
               {
                 "order": 62,
@@ -4063,7 +4072,7 @@
                 "type": "int",
                 "name": "Local load phase A active power (parallel data)",
                 "unitValue": "0.01",
-                "unitType": "KW"
+                "unitType": "kW"
               },
               {
                 "order": 63,
@@ -4071,7 +4080,7 @@
                 "type": "int",
                 "name": "Local load B-phase active power (parallel data)",
                 "unitValue": "0.01",
-                "unitType": "KW"
+                "unitType": "kW"
               },
               {
                 "order": 64,
@@ -4079,7 +4088,7 @@
                 "type": "int",
                 "name": "Local load phase C active power (parallel data)",
                 "unitValue": "0.01",
-                "unitType": "KW"
+                "unitType": "kW"
               },
               {
                 "order": 65,
@@ -4087,7 +4096,7 @@
                 "type": "int",
                 "name": "PV total power (parallel data)",
                 "unitValue": "0.01",
-                "unitType": "KW"
+                "unitType": "kW"
               },
               {
                 "order": 66,
@@ -4095,7 +4104,7 @@
                 "type": "int",
                 "name": "Total battery power (parallel data)",
                 "unitValue": "0.01",
-                "unitType": "KW"
+                "unitType": "kW"
               },
               {
                 "order": 67,

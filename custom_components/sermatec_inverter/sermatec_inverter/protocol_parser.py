@@ -242,6 +242,10 @@ class SermatecProtocolParser:
                     newField["device_class"] = "TEMPERATURE"
                 elif newField["unit"] == "Hz":
                     newField["device_class"] = "FREQUENCY"
+            
+            if "deviceClass" in field:
+                logger.debug(f"Field has an explicit device class: {field['deviceClass']}")
+                newField["device_class"] = field['deviceClass']
                                   
             # Do not parse when no data are supplied (dry run) -> checking out list of available sensors,
             # useful e.g. for Home Assistant.
