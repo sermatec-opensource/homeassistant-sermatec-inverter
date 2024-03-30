@@ -53,12 +53,26 @@ async def async_setup_entry(
     async_add_entities  : Callable
 ) -> None:
     
-    smc_api = hass.data[DOMAIN][config_entry.entry_id]
-    coordinator = SermatecCoordinator(hass, smc_api)
+    smc_api : Sermatec = hass.data[DOMAIN][config_entry.entry_id]
+
+    _LOGGER.info("Getting inverter version...")
+    retries : int = 3
+    while not await smc_api.connect() and retries > 0:
+        await asyncio.sleep(2)
+        retries -= 1
+
+    if not smc_api.isConnected():
+        raise ConfigEntryNotReady(f"Can't get inverter version - can't connect to the inverter.")
+    elif smc_api.pcuVersion == 0:
+        raise ConfigEntryNotReady(f"Inverted did not return version.")
+
+    smc_api.disconnect()
+
+    coordinator = SermatecCoordinator(hass, smc_api, smc_api.pcuVersion)
     
     serial_number = config_entry.data["serial"]
     
-    available_sensors = smc_api.listSensors(pcuVersion=411)
+    available_sensors = smc_api.listSensors(pcuVersion=smc_api.pcuVersion)
     hass_sensors = []
     for key, val in available_sensors.items():
         if "device_class" in val:
@@ -140,7 +154,7 @@ async def async_setup_entry(
 class SermatecCoordinator(DataUpdateCoordinator):
     """Inverter data coordinator."""
 
-    def __init__(self, hass : HomeAssistant, smc_api : Sermatec):
+    def __init__(self, hass : HomeAssistant, smc_api : Sermatec, pcuVersion : int):
         """Coordinator initialization."""
         super().__init__(
             hass,
@@ -149,6 +163,7 @@ class SermatecCoordinator(DataUpdateCoordinator):
             update_interval = timedelta(seconds = 30),
         )
         self.smc_api = smc_api
+        self.pcuVersion = pcuVersion
         self.first_time_update = True
 
     async def _async_update_data(self):
@@ -162,7 +177,7 @@ class SermatecCoordinator(DataUpdateCoordinator):
         
         _LOGGER.info("Fetching data from inverter...")
         retries : int = 3
-        while not await self.smc_api.connect() and retries > 0:
+        while not await self.smc_api.connect(version=self.pcuVersion) and retries > 0:
             await asyncio.sleep(2)
             retries -= 1
 
@@ -180,7 +195,7 @@ class SermatecCoordinator(DataUpdateCoordinator):
                 pass
             except (NotConnected, ConnectionResetError):
                 await asyncio.sleep(5)
-                await self.smc_api.connect()
+                await self.smc_api.connect(version=self.pcuVersion)
             else:
                 coordinator_data.update(response)
 
@@ -188,6 +203,8 @@ class SermatecCoordinator(DataUpdateCoordinator):
 
         if not coordinator_data:
             raise UpdateFailed(f"Can't update any values.")
+
+        _LOGGER.info("Data fetched!")
 
         return coordinator_data
     
