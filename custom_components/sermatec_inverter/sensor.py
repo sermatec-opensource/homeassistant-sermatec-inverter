@@ -81,6 +81,28 @@ async def async_setup_entry(
                 unit=sensor_unit
             )
         )
+
+    # Adding special sensors -- for convenience and usage with Energy dashboard.
+    hass_sensors.extend([
+        SermatecPositiveSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key        = "grid_active_power",
+            name            = "Grid export",
+            id              = "grid_export",
+            device_class    = "power",
+            unit            = "W"   
+        ),
+        SermatecNegativeSensor(
+            coordinator     = coordinator,
+            serial_number   = serial_number,
+            dict_key        = "grid_active_power",
+            name            = "Grid import",
+            id              = "grid_import",
+            device_class    = "power",
+            unit            = "W"
+        ),
+    ])
     
     # TODO: add special sensors manally
 
@@ -201,8 +223,12 @@ class SermatecPositiveSensor(SermatecSensorBase):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        data = self.coordinator.data[self.dict_key]
-        self._attr_native_value = data if data > 0 else 0
+        if self.coordinator.data and self.dict_key in self.coordinator.data:
+            data = self.coordinator.data[self.dict_key]["value"]
+            self._attr_native_value = data if data > 0 else 0
+            self._attr_available = True
+        else:
+            self._attr_available = False
         self.async_write_ha_state()
 
 class SermatecNegativeSensor(SermatecSensor):
@@ -216,8 +242,12 @@ class SermatecNegativeSensor(SermatecSensor):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        data = self.coordinator.data[self.dict_key]
-        self._attr_native_value = abs(data) if data < 0 else 0
+        if self.coordinator.data and self.dict_key in self.coordinator.data:
+            data = self.coordinator.data[self.dict_key]["value"]
+            self._attr_native_value = abs(data) if data < 0 else 0
+            self._attr_available = True
+        else:
+            self._attr_available = False
         self.async_write_ha_state()
 
 class SermatecPositivePowerSensor(SermatecSensor):
