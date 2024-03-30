@@ -122,14 +122,21 @@ class SermatecCoordinator(DataUpdateCoordinator):
             update_interval = timedelta(seconds = 30),
         )
         self.smc_api = smc_api
+        self.first_time_update = True
 
     async def _async_update_data(self):
         """Fetch data from inverter."""
 
-        _LOGGER.info("fetching")
+        # Because loading data from the inverter takes a very long time,
+        # skipping the update on integration load -> to not obstruct Home Assistant from loading.
+        if self.first_time_update:
+            self.first_time_update = False
+            return {}
+        
+        _LOGGER.info("Fetching data from inverter...")
         retries : int = 3
         while not await self.smc_api.connect() and retries > 0:
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(2)
             retries -= 1
 
         if not self.smc_api.isConnected():
@@ -144,8 +151,8 @@ class SermatecCoordinator(DataUpdateCoordinator):
                 response = await self.smc_api.getCustom(cmd)
             except (NoDataReceived, FailedResponseIntegrityCheck):
                 pass
-            except NotConnected:
-                await asyncio.sleep(0.5)
+            except (NotConnected, ConnectionResetError):
+                await asyncio.sleep(5)
                 await self.smc_api.connect()
             else:
                 coordinator_data.update(response)
