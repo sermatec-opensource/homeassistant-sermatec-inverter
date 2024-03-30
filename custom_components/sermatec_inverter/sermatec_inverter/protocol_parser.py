@@ -60,6 +60,70 @@ class SermatecProtocolParser:
         else:
             return "Unknown"
 
+    def __parseModelCode(self, value : int) -> str:
+        if value == 0x0001:
+            return "10 kW"
+        elif value == 0x0002:
+            return "5 kW"
+        elif value == 0x0003:
+            return "6 kW"
+        elif value == 0x0005:
+            return "3 kW"
+    
+    def __parseBatteryManufacturer(self, value : int) -> str:
+        if value == 1:
+            return "No battery"
+        elif value == 2:
+            return "PylonTech High Voltage Battery"
+        elif value == 3:
+            return "PylonTech Low Voltage Battery"
+        elif value == 9:
+            return "Nelumbo HV Battery"
+        elif value == 12:
+            return "Generic High Voltage Battery"
+        elif value == 13:
+            return "Generic Low Voltage Battery"
+        elif value == 14:
+            return "Dyness High Voltage Battery"
+        elif value == 22:
+            return "BYD High Voltage Battery"
+        elif value == 23:
+            return "BYD Low Voltage Battery"
+        elif value == 25:
+            return "AOBO Battery"
+        elif value == 26:
+            return "Soluna 15K Pack HV"
+        elif value == 27:
+            return "Soluna 4K LV"
+        elif value == 28:
+            return "Soluna 3K LV"
+        elif value == 30:
+            return "Pylon Low Voltage Battery 485"
+        else:
+            return "Unknown battery"
+
+    def __parseBatteryType(self, value : int) -> str:
+        if value == 1:
+            return "Lithium Battery"
+        elif value == 2:
+            return "Lead-acid Battery"
+        else:
+            return "Unknown battery type"
+
+    def __parseMeterProtocol(self, value : int) -> str:
+        if value == 1:
+            return "Not installed"
+        elif value == 2:
+            return "Acrel Three-phase meter"
+        elif value == 3:
+            return "Acrel Single-phase meter"
+        elif value == 4:
+            return "Three-phase Eastron meter"
+        elif value == 5:
+            return "Single-phase Eastron meter"
+        else:
+            return "Unknown meter"
+
     # Enquoting the SermatecProtocolParser type because it is a forward declaration (PEP 484).
     FIELD_PARSERS : dict[str, Callable[["SermatecProtocolParser", Any], Any]] = {
         "batteryStatus" : __parseBatteryStatus,
@@ -67,7 +131,12 @@ class SermatecProtocolParser:
     }
 
     NAME_BASED_FIELD_PARSERS : dict[str, Callable[["SermatecProtocolParser", Any], Any]] = {
-        "battery_communication_connection_status" : __parseBatteryComStatus
+        "battery_communication_connection_status" : __parseBatteryComStatus,
+        "model_code": __parseModelCode,
+        "battery_manufacturer_number__code_list_": __parseBatteryManufacturer,
+        "battery_communication_protocol_selection": __parseBatteryManufacturer,
+        "dc_side_battery_type": __parseBatteryType,
+        "meter_communication_protocol_selection": __parseMeterProtocol
     }
 
 
