@@ -3,6 +3,7 @@ import json
 import re
 from typing import Any, Callable
 from .exceptions import *
+from pathlib import Path
 
 # Local module logger.
 logger = logging.getLogger(__name__)
@@ -100,7 +101,7 @@ class SermatecProtocolParser:
         elif value == 30:
             return "Pylon Low Voltage Battery 485"
         else:
-            return "Unknown battery"
+            return "Unknown"
 
     def __parseBatteryType(self, value : int) -> str:
         if value == 1:
@@ -140,14 +141,21 @@ class SermatecProtocolParser:
     }
 
 
-    def __init__(self, path : str):
-        with open(path, "r") as protocolFile:
+    def __init__(self, protocolPath : str, languageFilePath : Path):
+        with open(protocolPath, "r") as protocolFile:
             protocolData = json.load(protocolFile)
             try:
                 self.osim = protocolData["osim"]
             except KeyError:
                 logger.error("Protocol file malformed, 'osim' key not found.")
                 raise ProtocolFileMalformed()
+        self.translations = {}
+        with languageFilePath.open("r") as langFile:
+            for line in langFile.readlines():
+                splitLine = line.replace("\"", "").replace("\n", "").split(";")
+                original_name = splitLine[0]
+                translated_name = splitLine[1]
+                self.translations[original_name] = translated_name
             
     def getCommandCodeFromName(self, commandName : str) -> int:
         if commandName in self.COMMAND_SHORT_NAMES:
@@ -239,6 +247,8 @@ class SermatecProtocolParser:
         replyPosition : int     = self.REPLY_OFFSET_DATA
         prevReplyPosition : int = 0
 
+        print(self.translations)
+
         for idx, field in enumerate(cmdFields):
 
             # Whether to ignore this field (unknown type, reserved field...)
@@ -274,9 +284,16 @@ class SermatecProtocolParser:
                 else:
                     logger.error("Field is of a type 'bitRange' but is missing key 'fromBit' or 'endBit'.")
                     raise ProtocolFileMalformed()
+            
+            newField = {}
 
+            if field["name"] in self.translations:
+                fieldName = self.translations[field["name"]]
+            else:
+                fieldName = field["name"]
 
-            fieldName = field["name"]
+            newField["name"] = fieldName
+
             fieldTag = re.sub(r"[^A-Za-z0-9]", "_", field["name"]).lower()
             logger.debug(f"Created tag from name: {fieldTag}")
 
@@ -291,7 +308,6 @@ class SermatecProtocolParser:
                 fieldMultiplier : float = 1
                 logger.debug(f"Field {fieldName} has not 'unitValue' key, using 1 as a default multiplier.")          
             
-            newField = {}
 
             if "unitType" in field:
                 logger.debug(f"Field has a unit: {field['unitType']}")
@@ -321,8 +337,6 @@ class SermatecProtocolParser:
             if not dryrun:
                 currentFieldData = reply[ replyPosition : (replyPosition + fieldLength) ]
                 logger.debug(f"Parsing field data: {currentFieldData.hex(' ')}")
-
-                newField : dict = {}
                 
                 if fieldType == "int":
                     newField["value"] = round(int.from_bytes(currentFieldData, byteorder = "big", signed = True) * fieldMultiplier, self.__getMultiplierDecimalPlaces(fieldMultiplier))

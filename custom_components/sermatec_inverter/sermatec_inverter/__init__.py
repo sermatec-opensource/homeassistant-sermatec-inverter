@@ -12,13 +12,23 @@ class Sermatec:
     QUERY_READ_TIMEOUT      = 5
     QUERY_ATTEMPTS          = 5
 
-    def __init__(self, host : str, port : int, protocolFilePath : str = None):
+    LANG_FILES_FOLDER       = Path(__file__).parent / "translations";
+
+    def __init__(self, host : str, port : int, protocolFilePath : str = None, language : str = "en"):
         if not protocolFilePath:
             protocolFilePath = (Path(__file__).parent / "protocol-en.json").resolve()
+
+        if not self.LANG_FILES_FOLDER.exists():
+            raise FileNotFoundError("Translation folder not found!")
+        
+        lang_file_path = self.LANG_FILES_FOLDER / f"{language}.csv"
+        if not lang_file_path.exists():
+            raise FileNotFoundError("Required translation not exists!")
+
         self.host = host
         self.port = port
         self.connected = False
-        self.parser = protocol_parser.SermatecProtocolParser(protocolFilePath)
+        self.parser = protocol_parser.SermatecProtocolParser(protocolFilePath, lang_file_path)
         self.pcuVersion = 0
     
     async def __sendQuery(self, command : int) -> bytes:

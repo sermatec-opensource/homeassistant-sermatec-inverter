@@ -625,6 +625,8 @@
                 "byteLen": 2,
                 "type": "bit",
                 "name": "grid power down",
+                "unitType": "binary",
+                "deviceClass": "POWER",
                 "bitPosition": 14
               },
               {
