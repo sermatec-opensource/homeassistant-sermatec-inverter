@@ -1,0 +1,21 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Zařízení již je nakonfigurováno"
+        },
+        "error": {
+            "cannot_connect": "Nepodařilo se připojit k měniči",
+            "invalid_auth": "Chybné přihlašovací údaje",
+            "unknown": "Neočekávaná chyba"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "host": "Host (IP adresa)",
+                    "port": "Port",
+                    "language": "Jazyk"
+                }
+            }
+        }
+    }
+}
