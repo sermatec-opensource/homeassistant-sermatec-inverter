@@ -80,7 +80,7 @@ async def async_setup_entry(
                 coordinator,
                 serial_number,
                 dict_key=key,
-                name=key,
+                name=val["name"],
                 device_class=_smc_convert_device_class(sensor_device_class),
                 unit=sensor_unit
             )
