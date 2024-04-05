@@ -31,7 +31,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     
     smc_api = Sermatec(
         entry.data['host'],
-        entry.data['port']
+        entry.data['port'],
+        language=entry.data["language"]
     )
 
     _LOGGER.info("Getting inverter version...")

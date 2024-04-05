@@ -8,6 +8,7 @@ from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers.selector import selector
 
 from .sermatec_inverter import Sermatec
 
@@ -19,7 +20,13 @@ _LOGGER = logging.getLogger(__name__)
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required("host"): str,
-        vol.Required("port"): str,
+        vol.Optional("port", default="8899"): str,
+        vol.Required("language"): selector({
+            "select":{
+                "options":["en", "cs"],
+                "mode": "dropdown"
+            }
+        })
     }
 )
 
