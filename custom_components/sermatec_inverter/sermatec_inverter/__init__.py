@@ -146,10 +146,27 @@ class Sermatec:
         
         sensorList : dict = {}
         for cmd in self.parser.getQueryCommands(pcuVersion):
-            sensorList.update(self.parser.parseReply(cmd, pcuVersion, bytearray(), dryrun=True))
+            for key, field in self.parser.parseReply(cmd, pcuVersion, bytearray(), dryrun=True).items():
+                if "unit" in field and field["unit"] == "binary":
+                    continue
+                else:
+                    sensorList.update({key: field})
 
         return sensorList
     
+    def listBinarySensors(self, pcuVersion : int = None) -> dict:
+        # If no specific pcuVersion specified, use (possibly) previously discovered.
+        if not pcuVersion:
+            pcuVersion = self.pcuVersion
+        
+        sensorList : dict = {}
+        for cmd in self.parser.getQueryCommands(pcuVersion):
+            for key, field in self.parser.parseReply(cmd, pcuVersion, bytearray(), dryrun=True).items():
+                if "unit" in field and field["unit"] == "binary":
+                    sensorList.update({key: field})
+
+        return sensorList
+
     def getQueryCommands(self, pcuVersion : int = None) -> dict:
         # If no specific pcuVersion specified, use (possibly) previously discovered.
         if not pcuVersion:

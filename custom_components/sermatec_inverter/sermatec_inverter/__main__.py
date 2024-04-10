@@ -103,7 +103,9 @@ async def listFunc(**kwargs):
         return
 
     if kwargs["type"] == "sensors":
-        print(await smc.listSensors())
+        print(smc.listSensors())
+    elif kwargs["type"] == "binarysensors":
+        print(smc.listBinarySensors())
     
     print("Disconnecting...", end = "")
     await smc.disconnect()
@@ -138,7 +140,7 @@ if __name__ == "__main__":
     listParser.add_argument(
         "type",
         help = "What type of features to list.",
-        choices = ["sensors", "buttons"]
+        choices = ["sensors", "binarysensors"]
     )
 
     customgetParser = subparsers.add_parser("customget", help = "Query the inverter using custom command.")

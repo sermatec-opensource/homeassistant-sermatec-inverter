@@ -247,8 +247,6 @@ class SermatecProtocolParser:
         replyPosition : int     = self.REPLY_OFFSET_DATA
         prevReplyPosition : int = 0
 
-        print(self.translations)
-
         for idx, field in enumerate(cmdFields):
 
             # Whether to ignore this field (unknown type, reserved field...)
@@ -287,16 +285,15 @@ class SermatecProtocolParser:
             
             newField = {}
 
+            fieldTag = re.sub(r"[^A-Za-z0-9]", "_", field["name"]).lower()
+            logger.debug(f"Created tag from name: {fieldTag}")
+
             if field["name"] in self.translations:
                 fieldName = self.translations[field["name"]]
             else:
                 fieldName = field["name"]
 
             newField["name"] = fieldName
-
-            fieldTag = re.sub(r"[^A-Za-z0-9]", "_", field["name"]).lower()
-            logger.debug(f"Created tag from name: {fieldTag}")
-
 
             if "unitValue" in field:
                 try:
