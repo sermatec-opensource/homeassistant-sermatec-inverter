@@ -2,7 +2,7 @@ name: Release master version
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 jobs:
   release:
