@@ -1,10 +1,11 @@
 {
+  "domain": "sermatec_inverter",
+  "name": "Sermatec Inverter",
   "codeowners": ["@andreondra"],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/andreondra/homeassistant-sermatec-inverter",
-  "domain": "sermatec_inverter",
   "iot_class": "local_polling",
   "name": "Sermatec Inverter",
-  "version": "1.0.0"
+  "version": "2.0.0"
 }
