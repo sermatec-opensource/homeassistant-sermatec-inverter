@@ -23,7 +23,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
         vol.Optional("port", default="8899"): str,
         vol.Required("language"): selector({
             "select":{
-                "options":["en", "cs"],
+                "options":["en", "cs", "fr"],
                 "mode": "dropdown"
             }
         })
