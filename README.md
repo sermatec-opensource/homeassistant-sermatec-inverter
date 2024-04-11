@@ -1,7 +1,5 @@
 ![hassfest badge](https://github.com/andreondra/homeassistant-sermatec-inverter/actions/workflows/hassfest.yaml/badge.svg)
 
-**NOTICE: Heavy refactoring is in progress. Check `dev` branch to track the development.**
-
 # Sermatec Inverter for Home Assistant
 
 ![Home Assistant screenshot](assets/hass_integration.png)
