@@ -140,7 +140,8 @@
                 "order": 10,
                 "byteLen": 2,
                 "type": "uInt",
-                "name": "Charge/discharge times"
+                "name": "Charge/discharge times",
+                "listIgnore": true
               },
               {
                 "order": 11,
@@ -587,7 +588,8 @@
                 "byteLen": 2,
                 "type": "int",
                 "name": "backup power factor",
-                "unitValue": "0.001"
+                "unitValue": "0.001",
+                "deviceClass": "POWER_FACTOR"
               },
               {
                 "order": 53,
@@ -625,7 +627,6 @@
                 "byteLen": 2,
                 "type": "bit",
                 "name": "grid power down",
-                "unitType": "binary",
                 "deviceClass": "POWER",
                 "bitPosition": 14
               },
@@ -668,7 +669,8 @@
                 "name": "battery status",
                 "same": true,
                 "fromBit": 8,
-                "endBit": 10
+                "endBit": 10,
+                "listIgnore": true
               },
               {
                 "order": 6,
@@ -677,7 +679,8 @@
                 "name": "AC side running status",
                 "same": true,
                 "fromBit": 5,
-                "endBit": 8
+                "endBit": 8,
+                "listIgnore": true
               },
               {
                 "order": 7,
@@ -694,7 +697,8 @@
                 "name": "AC side operation mode",
                 "same": true,
                 "fromBit": 1,
-                "endBit": 4
+                "endBit": 4,
+                "listIgnore": true
               },
               {
                 "order": 9,
@@ -710,7 +714,8 @@
                 "byteLen": 2,
                 "type": "uInt",
                 "name": "inverter status word",
-                "same": true
+                "same": true,
+                "listIgnore": true
               },
               {
                 "order": 11,
@@ -718,7 +723,8 @@
                 "type": "bitRange",
                 "name": "PV side self-test steps",
                 "fromBit": 10,
-                "endBit": 13
+                "endBit": 13,
+                "listIgnore": true
               },
               {
                 "order": 12,
@@ -727,7 +733,8 @@
                 "name": "DC side self-test steps",
                 "same": true,
                 "fromBit": 7,
-                "endBit": 10
+                "endBit": 10,
+                "listIgnore": true
               },
               {
                 "order": 13,
@@ -736,7 +743,8 @@
                 "name": "AC side self-test steps",
                 "same": true,
                 "fromBit": 4,
-                "endBit": 7
+                "endBit": 7,
+                "listIgnore": true
               },
               {
                 "order": 14,
@@ -745,7 +753,8 @@
                 "name": "DC side running status",
                 "same": true,
                 "fromBit": 2,
-                "endBit": 4
+                "endBit": 4,
+                "listIgnore": true
               },
               {
                 "order": 15,
@@ -754,14 +763,16 @@
                 "name": "PV side running status",
                 "same": true,
                 "fromBit": 0,
-                "endBit": 2
+                "endBit": 2,
+                "listIgnore": true
               },
               {
                 "order": 16,
                 "byteLen": 2,
                 "type": "uInt",
                 "name": "PV status word",
-                "same": true
+                "same": true,
+                "listIgnore": true
               },
               {
                 "order": 17,
@@ -941,7 +952,8 @@
                 "tag": "refluxs",
                 "name": "anti-backflow function",
                 "converter": "map(1:ee00, 2:00ee, default:0000)",
-                "validate": "enumStr(ee00,00ee,0000)"
+                "validate": "enumStr(ee00,00ee,0000)",
+                "unitType": "binary"
               },
               {
                 "order": 10,
@@ -1383,7 +1395,8 @@
                 "name": "unit electricity price (tip)",
                 "unitType": "currency",
                 "unitValue": "0.1",
-                "precision": 1
+                "precision": 1,
+                "listIgnore": true
               },
               {
                 "order": 1,
@@ -1393,7 +1406,8 @@
                 "name": "unit electricity price (peak)",
                 "unitType": "currency",
                 "unitValue": "0.1",
-                "precision": 1
+                "precision": 1,
+                "listIgnore": true
               },
               {
                 "order": 2,
@@ -1403,7 +1417,8 @@
                 "name": "unit electricity price (flat)",
                 "unitType": "currency",
                 "unitValue": "0.1",
-                "precision": 1
+                "precision": 1,
+                "listIgnore": true
               },
               {
                 "order": 3,
@@ -1413,7 +1428,8 @@
                 "name": "unit electricity price (valley)",
                 "unitType": "currency",
                 "unitValue": "0.1",
-                "precision": 1
+                "precision": 1,
+                "listIgnore": true
               },
               {
                 "order": 4,
@@ -1428,7 +1444,8 @@
                 "byteLen": 2,
                 "type": "int",
                 "tag": "chargePower",
-                "name": "Battery charging and discharging power (command mode is valid)"
+                "name": "Battery charging and discharging power (command mode is valid)",
+                "listIgnore": true
               },
               {
                 "order": 6,
@@ -1458,7 +1475,8 @@
                 "type": "hex",
                 "tag": "refluxs",
                 "converter": "map(ee00:1, 00ee:2, default:0)",
-                "name": "anti-backflow function"
+                "name": "anti-backflow function",
+                "unitType": "binary"
               },
               {
                 "order": 10,
@@ -1479,7 +1497,8 @@
                 "byteLen": 2,
                 "type": "int",
                 "tag": "totalPriceNum",
-                "name": "How many sets of data are there"
+                "name": "How many sets of data are there",
+                "listIgnore": true
               },
               {
                 "order": 13,
@@ -1517,49 +1536,57 @@
                 "order": 16,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to charge (tip) when SOC<10"
+                "name": "Whether to charge (tip) when SOC<10",
+                "listIgnore": true
               },
               {
                 "order": 17,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to discharge (tip) when SOC>20"
+                "name": "Whether to discharge (tip) when SOC>20",
+                "listIgnore": true
               },
               {
                 "order": 18,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to charge (peak) when SOC<10"
+                "name": "Whether to charge (peak) when SOC<10",
+                "listIgnore": true
               },
               {
                 "order": 19,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to discharge (peak) when SOC>20"
+                "name": "Whether to discharge (peak) when SOC>20",
+                "listIgnore": true
               },
               {
                 "order": 20,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to charge (flat) when SOC<10"
+                "name": "Whether to charge (flat) when SOC<10",
+                "listIgnore": true
               },
               {
                 "order": 21,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to discharge when SOC>20 (flat)"
+                "name": "Whether to discharge when SOC>20 (flat)",
+                "listIgnore": true
               },
               {
                 "order": 22,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to charge (valley) when SOC<10"
+                "name": "Whether to charge (valley) when SOC<10",
+                "listIgnore": true
               },
               {
                 "order": 23,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to discharge (valley) when SOC>20"
+                "name": "Whether to discharge (valley) when SOC>20",
+                "listIgnore": true
               },
               {
                 "order": 24,
@@ -1676,7 +1703,8 @@
                 "tag": "price1",
                 "name": "unit electricity price (tip)",
                 "unitType": "currency",
-                "unitValue": "0.1"
+                "unitValue": "0.1",
+                "listIgnore": true
               },
               {
                 "order": 1,
@@ -1685,7 +1713,8 @@
                 "tag": "price2",
                 "name": "unit electricity price (peak)",
                 "unitType": "currency",
-                "unitValue": "0.1"
+                "unitValue": "0.1",
+                "listIgnore": true
               },
               {
                 "order": 2,
@@ -1694,7 +1723,8 @@
                 "tag": "price3",
                 "name": "unit electricity price (flat)",
                 "unitType": "currency",
-                "unitValue": "0.1"
+                "unitValue": "0.1",
+                "listIgnore": true
               },
               {
                 "order": 3,
@@ -1703,7 +1733,8 @@
                 "tag": "price4",
                 "name": "unit electricity price (valley)",
                 "unitType": "currency",
-                "unitValue": "0.1"
+                "unitValue": "0.1",
+                "listIgnore": true
               },
               {
                 "order": 4,
@@ -1750,7 +1781,8 @@
                 "tag": "refluxs",
                 "name": "anti-backflow function",
                 "converter": "map(1:ee00, 2:00ee, default:0000)",
-                "validate": "enumStr(ee00,00ee,0000)"
+                "validate": "enumStr(ee00,00ee,0000)",
+                "unitType": "binary"
               },
               {
                 "order": 10,
@@ -1876,7 +1908,8 @@
                 "name": "Meter detection function",
                 "tag": "meterMonitor",
                 "converter": "map(1:ee00, 2:00ee, default:0000)",
-                "validate": "enumStr(ee00,00ee,0000)"
+                "validate": "enumStr(ee00,00ee,0000)",
+                "unitType": "binary"
               },
               {
                 "order": 1,
@@ -1885,7 +1918,8 @@
                 "name": "Three-phase unbalanced output",
                 "tag": "threePhase",
                 "converter": "map(1:ee00, 2:00ee, default:0000)",
-                "validate": "enumStr(ee00,00ee,0000)"
+                "validate": "enumStr(ee00,00ee,0000)",
+                "unitType": "binary"
               },
               {
                 "order": 2,
@@ -2045,7 +2079,8 @@
                 "name": "unit electricity price (tip)",
                 "unitType": "currency",
                 "unitValue": "0.1",
-                "precision": 1
+                "precision": 1,
+                "listIgnore": true
               },
               {
                 "order": 1,
@@ -2055,7 +2090,8 @@
                 "name": "unit electricity price (peak)",
                 "unitType": "currency",
                 "unitValue": "0.1",
-                "precision": 1
+                "precision": 1,
+                "listIgnore": true
               },
               {
                 "order": 2,
@@ -2065,7 +2101,8 @@
                 "name": "unit electricity price (flat)",
                 "unitType": "currency",
                 "unitValue": "0.1",
-                "precision": 1
+                "precision": 1,
+                "listIgnore": true
               },
               {
                 "order": 3,
@@ -2075,7 +2112,8 @@
                 "name": "unit electricity price (valley)",
                 "unitType": "currency",
                 "unitValue": "0.1",
-                "precision": 1
+                "precision": 1,
+                "listIgnore": true
               },
               {
                 "order": 4,
@@ -2120,7 +2158,8 @@
                 "type": "hex",
                 "tag": "refluxs",
                 "converter": "map(ee00:1, 00ee:2, default:0)",
-                "name": "anti-backflow function"
+                "name": "anti-backflow function",
+                "unitType": "binary"
               },
               {
                 "order": 10,
@@ -2181,7 +2220,8 @@
                 "type": "hex",
                 "tag": "meterMonitor",
                 "converter": "map(ee00:1, 00ee:2, default:0)",
-                "name": "Meter detection function"
+                "name": "Meter detection function",
+                "unitType": "binary"
               },
               {
                 "order": 17,
@@ -2189,7 +2229,8 @@
                 "type": "hex",
                 "tag": "threePhase",
                 "converter": "map(ee00:1, 00ee:2, default:0)",
-                "name": "Three-phase unbalanced output"
+                "name": "Three-phase unbalanced output",
+                "unitType": "binary"
               },
               {
                 "order": 18,
@@ -2243,49 +2284,57 @@
                 "order": 25,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to charge (tip) when SOC<10"
+                "name": "Whether to charge (tip) when SOC<10",
+                "listIgnore": true
               },
               {
                 "order": 26,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to discharge (tip) when SOC>20"
+                "name": "Whether to discharge (tip) when SOC>20",
+                "listIgnore": true
               },
               {
                 "order": 27,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to charge (peak) when SOC<10"
+                "name": "Whether to charge (peak) when SOC<10",
+                "listIgnore": true
               },
               {
                 "order": 28,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to discharge (peak) when SOC>20"
+                "name": "Whether to discharge (peak) when SOC>20",
+                "listIgnore": true
               },
               {
                 "order": 29,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to charge (flat) when SOC<10"
+                "name": "Whether to charge (flat) when SOC<10",
+                "listIgnore": true
               },
               {
                 "order": 30,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to discharge when SOC>20 (flat)"
+                "name": "Whether to discharge when SOC>20 (flat)",
+                "listIgnore": true
               },
               {
                 "order": 31,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to charge (valley) when SOC<10"
+                "name": "Whether to charge (valley) when SOC<10",
+                "listIgnore": true
               },
               {
                 "order": 32,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to discharge (valley) when SOC>20"
+                "name": "Whether to discharge (valley) when SOC>20",
+                "listIgnore": true
               }
             ]
           }
@@ -2308,7 +2357,8 @@
                 "name": "Meter detection function",
                 "tag": "meterMonitor",
                 "converter": "map(1:ee00, 2:00ee, default:0000)",
-                "validate": "enumStr(ee00,00ee,0000)"
+                "validate": "enumStr(ee00,00ee,0000)",
+                "unitType": "binary"
               },
               {
                 "order": 1,
@@ -2317,7 +2367,8 @@
                 "name": "Three-phase unbalanced output",
                 "tag": "threePhase",
                 "converter": "map(1:ee00, 2:00ee, default:0000)",
-                "validate": "enumStr(ee00,00ee,0000)"
+                "validate": "enumStr(ee00,00ee,0000)",
+                "unitType": "binary"
               },
               {
                 "order": 2,
@@ -2348,7 +2399,8 @@
                 "name": "unit electricity price (tip)",
                 "unitType": "currency",
                 "unitValue": "0.1",
-                "precision": 1
+                "precision": 1,
+                "listIgnore": true
               },
               {
                 "order": 1,
@@ -2358,7 +2410,8 @@
                 "name": "unit electricity price (peak)",
                 "unitType": "currency",
                 "unitValue": "0.1",
-                "precision": 1
+                "precision": 1,
+                "listIgnore": true
               },
               {
                 "order": 2,
@@ -2368,7 +2421,8 @@
                 "name": "unit electricity price (flat)",
                 "unitType": "currency",
                 "unitValue": "0.1",
-                "precision": 1
+                "precision": 1,
+                "listIgnore": true
               },
               {
                 "order": 3,
@@ -2378,7 +2432,8 @@
                 "name": "unit electricity price (valley)",
                 "unitType": "currency",
                 "unitValue": "0.1",
-                "precision": 1
+                "precision": 1,
+                "listIgnore": true
               },
               {
                 "order": 4,
@@ -2393,7 +2448,8 @@
                 "byteLen": 2,
                 "type": "int",
                 "tag": "chargePower",
-                "name": "Battery charging and discharging power (command mode is valid)"
+                "name": "Battery charging and discharging power (command mode is valid)",
+                "listIgnore": true
               },
               {
                 "order": 6,
@@ -2423,14 +2479,16 @@
                 "type": "hex",
                 "tag": "refluxs",
                 "converter": "map(ee00:1, 00ee:2, default:0)",
-                "name": "anti-backflow function"
+                "name": "anti-backflow function",
+                "unitType": "binary"
               },
               {
                 "order": 10,
                 "byteLen": 2,
                 "type": "int",
                 "tag": "batteryCharge",
-                "name": "Battery charging and discharging (command mode takes effect)"
+                "name": "Battery charging and discharging (command mode takes effect)",
+                "listIgnore": true
               },
               {
                 "order": 11,
@@ -2444,7 +2502,8 @@
                 "byteLen": 2,
                 "type": "int",
                 "tag": "totalPriceNum",
-                "name": "How many sets of data are there"
+                "name": "How many sets of data are there",
+                "listIgnore": true
               },
               {
                 "order": 13,
@@ -2484,49 +2543,57 @@
                 "type": "int",
                 "tag": "powerFactor",
                 "name": "power factor setting",
-                "unitValue": "0.001"
+                "unitValue": "0.001",
+                "deviceClass": "POWER_FACTOR"
               },
               {
                 "order": 17,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to discharge (tip) when SOC>20"
+                "name": "Whether to discharge (tip) when SOC>20",
+                "listIgnore": true
               },
               {
                 "order": 18,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to charge (peak) when SOC<10"
+                "name": "Whether to charge (peak) when SOC<10",
+                "listIgnore": true
               },
               {
                 "order": 19,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to discharge (peak) when SOC>20"
+                "name": "Whether to discharge (peak) when SOC>20",
+                "listIgnore": true
               },
               {
                 "order": 20,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to charge (flat) when SOC<10"
+                "name": "Whether to charge (flat) when SOC<10",
+                "listIgnore": true
               },
               {
                 "order": 21,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to discharge when SOC>20 (flat)"
+                "name": "Whether to discharge when SOC>20 (flat)",
+                "listIgnore": true
               },
               {
                 "order": 22,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to charge (valley) when SOC<10"
+                "name": "Whether to charge (valley) when SOC<10",
+                "listIgnore": true
               },
               {
                 "order": 23,
                 "byteLen": 2,
                 "type": "int",
-                "name": "Whether to discharge (valley) when SOC>20"
+                "name": "Whether to discharge (valley) when SOC>20",
+                "listIgnore": true
               },
               {
                 "order": 24,
@@ -2576,7 +2643,8 @@
                 "type": "hex",
                 "tag": "meterMonitor",
                 "converter": "map(ee00:1, 00ee:2, default:0)",
-                "name": "Meter detection function"
+                "name": "Meter detection function",
+                "unitType": "binary"
               },
               {
                 "order": 1,
@@ -2584,7 +2652,8 @@
                 "type": "hex",
                 "tag": "threePhase",
                 "converter": "map(ee00:1, 00ee:2, default:0)",
-                "name": "Three-phase unbalanced output"
+                "name": "Three-phase unbalanced output",
+                "unitType": "binary"
               },
               {
                 "order": 2,
@@ -2618,7 +2687,8 @@
                 "name": "Meter detection function",
                 "tag": "meterMonitor",
                 "converter": "map(1:ee00, 2:00ee, default:0000)",
-                "validate": "enumStr(ee00,00ee,0000)"
+                "validate": "enumStr(ee00,00ee,0000)",
+                "unitType": "binary"
               },
               {
                 "order": 1,
@@ -2627,7 +2697,8 @@
                 "name": "Three-phase unbalanced output",
                 "tag": "threePhase",
                 "converter": "map(1:ee00, 2:00ee, default:0000)",
-                "validate": "enumStr(ee00,00ee,0000)"
+                "validate": "enumStr(ee00,00ee,0000)",
+                "unitType": "binary"
               },
               {
                 "order": 2,
@@ -3399,7 +3470,8 @@
                 "type": "hex",
                 "name": "Meter detection function",
                 "tag": "meterMonitor",
-                "converter": "map(ee00:1, 00ee:2, default:0)"
+                "converter": "map(ee00:1, 00ee:2, default:0)",
+                "unitType": "binary"
               },
               {
                 "order": 1,
@@ -3407,7 +3479,8 @@
                 "type": "hex",
                 "name": "Three-phase unbalanced output",
                 "tag": "threePhase",
-                "converter": "map(ee00:1, 00ee:2, default:0)"
+                "converter": "map(ee00:1, 00ee:2, default:0)",
+                "unitType": "binary"
               },
               {
                 "order": 2,
@@ -3762,7 +3835,8 @@
                 "byteLen": 2,
                 "type": "int",
                 "name": "power factor",
-                "unitValue": "0.001"
+                "unitValue": "0.001",
+                "deviceClass": "POWER_FACTOR"
               },
               {
                 "order": 23,
@@ -3994,7 +4068,8 @@
                 "byteLen": 2,
                 "type": "int",
                 "name": "backup power factor",
-                "unitValue": "0.001"
+                "unitValue": "0.001",
+                "deviceClass": "POWER_FACTOR"
               },
               {
                 "order": 53,
@@ -4241,7 +4316,8 @@
                 "type": "int",
                 "tag": "powerFactor",
                 "name": "power factor setting",
-                "unitValue": "0.001"
+                "unitValue": "0.001",
+                "deviceClass": "POWER_FACTOR"
               },
               {
                 "order": 1,
@@ -4269,7 +4345,8 @@
                 "name": "Meter detection function",
                 "tag": "meterMonitor",
                 "converter": "map(1:ee00, 2:00ee, default:0000)",
-                "validate": "enumStr(ee00,00ee,0000)"
+                "validate": "enumStr(ee00,00ee,0000)",
+                "unitType": "binary"
               },
               {
                 "order": 1,
@@ -4278,7 +4355,8 @@
                 "name": "Three-phase unbalanced output",
                 "tag": "threePhase",
                 "converter": "map(1:ee00, 2:00ee, default:0000)",
-                "validate": "enumStr(ee00,00ee,0000)"
+                "validate": "enumStr(ee00,00ee,0000)",
+                "unitType": "binary"
               },
               {
                 "order": 2,
@@ -4466,7 +4544,8 @@
                 "type": "hex",
                 "name": "Meter detection function",
                 "tag": "meterMonitor",
-                "converter": "map(ee00:1, 00ee:2, default:0)"
+                "converter": "map(ee00:1, 00ee:2, default:0)",
+                "unitType": "binary"
               },
               {
                 "order": 1,
@@ -4474,7 +4553,8 @@
                 "type": "hex",
                 "name": "Three-phase unbalanced output",
                 "tag": "threePhase",
-                "converter": "map(ee00:1, 00ee:2, default:0)"
+                "converter": "map(ee00:1, 00ee:2, default:0)",
+                "unitType": "binary"
               },
               {
                 "order": 2,

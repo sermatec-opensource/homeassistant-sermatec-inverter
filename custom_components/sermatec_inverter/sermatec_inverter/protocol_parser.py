@@ -17,6 +17,17 @@ class SermatecProtocolParser:
     REQ_INVERTER_ADDRESS    = bytes([0x14])
     REQ_FOOTER              = bytes([0xae])
 
+    @staticmethod
+    def getResponseCommands(command : int) -> list[int]:
+        responseCommands = {
+            0x95: [0x95, 0x9D]
+        }
+
+        # Usually a single response is returned to a command,
+        # hence the default value.
+        return responseCommands.get(command, [command])
+
+
     COMMAND_SHORT_NAMES : dict = {
         "systemInformation"   : 0x98,
         "batteryStatus"       : 0x0a,
@@ -28,6 +39,8 @@ class SermatecProtocolParser:
     }
 
     ALL_QUERY_COMMANDS = [0x98, 0x0a, 0x0b, 0x0c, 0x95, 0x0d]
+    # Some codes are not meant to be sent, just received via another code.
+    ALL_RESPONSE_CODES = [0x98, 0x0a, 0x0b, 0x0c, 0x95, 0x0d, 0x9d]
 
     def __parseBatteryStatus(self, value : int) -> str:
         if value == 0x0011:
@@ -125,6 +138,15 @@ class SermatecProtocolParser:
         else:
             return "Unknown meter"
 
+    def __parseEEBinarySensor(self, value : int) -> bool:
+        if value == 0xee00:
+            return True
+        else:
+            return False
+        
+    def __parseProtocolVersion(self, value : int) -> str:
+        return f"{int(value / 100)}.{int((value / 10) % 10)}.{value % 10}"
+
     # Enquoting the SermatecProtocolParser type because it is a forward declaration (PEP 484).
     FIELD_PARSERS : dict[str, Callable[["SermatecProtocolParser", Any], Any]] = {
         "batteryStatus" : __parseBatteryStatus,
@@ -137,7 +159,9 @@ class SermatecProtocolParser:
         "battery_manufacturer_number__code_list_": __parseBatteryManufacturer,
         "battery_communication_protocol_selection": __parseBatteryManufacturer,
         "dc_side_battery_type": __parseBatteryType,
-        "meter_communication_protocol_selection": __parseMeterProtocol
+        "meter_communication_protocol_selection": __parseMeterProtocol,
+        "meter_detection_function": __parseEEBinarySensor,
+        "three_phase_unbalanced_output": __parseEEBinarySensor
     }
 
 
@@ -177,6 +201,9 @@ class SermatecProtocolParser:
         listCmds.sort()
         print(type(listCmds[0]))
         return listCmds
+    
+    def getResponseCodes(self, version : int) -> list:
+        return self.ALL_RESPONSE_CODES
 
     def __getCommandByVersion(self, command : int, version : int) -> dict:
         """Get a newest version of a reply to a command specified.
@@ -267,6 +294,8 @@ class SermatecProtocolParser:
                 logger.error("Field length is zero or negative.")
                 raise ProtocolFileMalformed()
 
+            newField = {}
+
             fieldType = field["type"]
             if fieldType == "bit":
                 if "bitPosition" in field:
@@ -274,6 +303,7 @@ class SermatecProtocolParser:
                 else:
                     logger.error("Field is of a type 'bit', but is missing key 'bitPosition'.")
                     raise ProtocolFileMalformed()
+                newField["unit"] = "binary"
 
             if fieldType == "bitRange":
                 if "fromBit" and "endBit":
@@ -283,7 +313,6 @@ class SermatecProtocolParser:
                     logger.error("Field is of a type 'bitRange' but is missing key 'fromBit' or 'endBit'.")
                     raise ProtocolFileMalformed()
             
-            newField = {}
 
             fieldTag = re.sub(r"[^A-Za-z0-9]", "_", field["name"]).lower()
             logger.debug(f"Created tag from name: {fieldTag}")
@@ -345,19 +374,19 @@ class SermatecProtocolParser:
                     newField["value"] = trimmedString.decode('ascii')
                 elif fieldType == "bit":
                     binString : str = bin(int.from_bytes(currentFieldData, byteorder = "little", signed = False)).removeprefix("0b")
-                    newField["value"] = int(binString[fieldBitPosition])
+                    newField["value"] = bool(binString[fieldBitPosition])
                 elif fieldType == "bitRange":
                     binString : str = bin(int.from_bytes(currentFieldData, byteorder = "little", signed = False)).removeprefix("0b")
                     newField["value"] = binString[fieldFromBit:fieldEndBit]
                 elif fieldType == "hex":
-                    newField["value"] = currentFieldData.hex()
+                    newField["value"] =  int.from_bytes(currentFieldData, byteorder = "big", signed = False)
                 elif fieldType == "preserve":
-                    ignoreField = True
+                    pass
                 elif fieldType == "long":
                     newField["value"] = round(int.from_bytes(currentFieldData, byteorder = "big", signed = True) * fieldMultiplier, self.__getMultiplierDecimalPlaces(fieldMultiplier))
                 else:
                     ignoreField = True
-                    logger.warning(f"The provided field is of an unsuported type '{fieldType}'. Please contact developer.")
+                    logger.info(f"The provided field is of an unsuported type '{fieldType}'.")
 
                 # Some field have a meaning encoded to integers: trying to parse.
                 if "parser" in field and field["parser"] in self.FIELD_PARSERS:
@@ -368,6 +397,17 @@ class SermatecProtocolParser:
                 if fieldTag in self.NAME_BASED_FIELD_PARSERS:
                     logger.debug("This field has an name-based parser available, parsing.")
                     newField["value"] = self.NAME_BASED_FIELD_PARSERS[fieldTag](self, newField["value"])
+
+            # Fields with "repeat" are not supported for now, skipping.
+            if "repeat" in field:
+                fieldLength *= int(field["repeat"])
+                ignoreField = True
+                logger.debug("Fields with 'repeat' are not supported, skipping...")
+
+            if fieldType == "preserve":
+                ignoreField = True
+
+            newField["listIgnore"] = field.get("listIgnore", False)
 
             if not ignoreField:
                 parsedData[fieldTag] = newField
