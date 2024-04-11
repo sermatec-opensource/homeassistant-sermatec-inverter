@@ -12,7 +12,8 @@
             "user": {
                 "data": {
                     "host": "Nom d'hôte",
-                    "port": "Port (défaut 8899)"
+                    "port": "Port",
+                    "language": "Langue"
                 }
             }
         }
