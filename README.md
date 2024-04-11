@@ -7,7 +7,7 @@
 ## Installation
 **IMPORTANT NOTICE FOR USERS OF OLD VERSIONS**: The new version of the integration is not backwards-compatible. This means you will need to manually remove the device from your Home Assistant and then add again.
 
-### Manual
+### Manual installation
 1. Download integration.
     - Latest development version can be downloaded from Releases as a zip.
 2. Unzip the downloaded zip file to your `custom_integrations` directory.
@@ -19,6 +19,9 @@
 Notes:
 - IP is probably assigned dynamically by your router's DHCP server. I recommend setting a static IP (available on most routers), otherwise you would probably need to change the IP in the config once in a while.
 - The default port is `8899`.
+
+#### Using legacy version
+If for some reason you need to use the legacy version which utilized the first version of the communication script, it is still available for downloaded [in Releases](https://github.com/sermatec-opensource/homeassistant-sermatec-inverter/releases/tag/v1.0.1).
 
 ## Tips
 ### Calculating total energy
