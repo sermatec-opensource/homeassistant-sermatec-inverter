@@ -6,6 +6,6 @@
   "dependencies": [],
   "documentation": "https://github.com/andreondra/homeassistant-sermatec-inverter",
   "iot_class": "local_polling",
-  "requirements": ["sermatec_inverter>=2022.3"],
-  "version": "1.0.1"
+  "name": "Sermatec Inverter",
+  "version": "2.0.0"
 }

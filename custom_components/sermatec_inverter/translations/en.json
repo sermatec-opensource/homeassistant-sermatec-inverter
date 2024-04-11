@@ -11,8 +11,9 @@
         "step": {
             "user": {
                 "data": {
-                    "host": "Host",
-                    "port": "Port (default 8899)"
+                    "host": "Host (IP address)",
+                    "port": "Port",
+                    "language": "Language"
                 }
             }
         }

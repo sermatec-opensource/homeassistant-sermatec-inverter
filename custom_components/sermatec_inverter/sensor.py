@@ -14,8 +14,9 @@ from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
     UpdateFailed,
+    ConfigEntryNotReady
 )
-from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
+from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity, SensorDeviceClass
 import homeassistant.helpers.config_validation as cv
 from homeassistant.const import (
     CONF_IP_ADDRESS,
@@ -23,7 +24,11 @@ from homeassistant.const import (
 )
 
 # API module.
-from sermatec_inverter import Sermatec
+from .sermatec_inverter import Sermatec
+from .sermatec_inverter.exceptions import *
+
+# Coordinator.
+from .coordinator import SermatecCoordinator
 
 # Constants.
 from .const import DOMAIN
@@ -38,6 +43,12 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     }
 )
 
+def _smc_convert_device_class(device_class : str | None):
+    if device_class:
+        return SensorDeviceClass[device_class]
+    else:
+        return None
+
 # Set up the sensor platform from a config entry.
 async def async_setup_entry(
     hass                : HomeAssistant,
@@ -45,333 +56,38 @@ async def async_setup_entry(
     async_add_entities  : Callable
 ) -> None:
     
-    smc_api = hass.data[DOMAIN][config_entry.entry_id]
-    coordinator = SermatecCoordinator(hass, smc_api)
-    
-    # await coordinator.async_config_entry_first_refresh()
-    serial_number = config_entry.data["serial"]
+    coordinator : SermatecCoordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
+    smc_api : Sermatec = hass.data[DOMAIN][config_entry.entry_id]["api"]
+    pcu_version = hass.data[DOMAIN][config_entry.entry_id]["pcu_version"]
 
-    sensors = [
-        SermatecSerialSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "battery_SOC",
-            name            = "Battery SOC",
-            device_class    = "battery",
-            unit            = "%"
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "battery_SOH",
-            name            = "Battery SOH",
-            device_class    = "battery",
-            unit            = "%"
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "battery_voltage",
-            name            = "Battery voltage",
-            device_class    = "voltage",
-            unit            = "V"
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "battery_current",
-            name            = "Battery current",
-            device_class    = "current",
-            unit            = "A"
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "battery_temperature",
-            name            = "Battery temperature",
-            device_class    = "temperature",
-            unit            = "°C"
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "battery_state",
-            name            = "Battery state",
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "battery_max_charging_current",
-            name            = "Battery max charging current",
-            device_class    = "current",
-            unit            = "A"
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "battery_max_discharging_current",
-            name            = "Battery max discharging current",
-            device_class    = "current",
-            unit            = "A"
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "pv1_voltage",
-            name            = "PV1 voltage",
-            device_class    = "voltage",
-            unit            = "V"
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "pv1_current",
-            name            = "PV1 current",
-            device_class    = "current",
-            unit            = "A"
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "pv1_power",
-            name            = "PV1 power",
-            device_class    = "power",
-            unit            = "W" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "pv2_voltage",
-            name            = "PV2 voltage",
-            device_class    = "voltage",
-            unit            = "V" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "pv2_current",
-            name            = "PV2 current",
-            device_class    = "current",
-            unit            = "A" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "pv2_power",
-            name            = "PV2 power",
-            device_class    = "power",
-            unit            = "W" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "ab_line_voltage",
-            name            = "AB line voltage",
-            device_class    = "voltage",
-            unit            = "V" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "a_phase_current",
-            name            = "A phase current",
-            device_class    = "current",
-            unit            = "A" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "a_phase_voltage",
-            name            = "A phase voltage",
-            device_class    = "voltage",
-            unit            = "V" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "bc_line_voltage",
-            name            = "BC line voltage",
-            device_class    = "voltage",
-            unit            = "V" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "b_phase_current",
-            name            = "B phase current",
-            device_class    = "current",
-            unit            = "A" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "b_phase_voltage",
-            name            = "B phase voltage",
-            device_class    = "voltage",
-            unit            = "V" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "c_phase_voltage",
-            name            = "C phase voltage",
-            device_class    = "voltage",
-            unit            = "V" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "ca_line_voltage",
-            name            = "CA line voltage",
-            device_class    = "voltage",
-            unit            = "V" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "c_phase_current",
-            name            = "C phase current",
-            device_class    = "current",
-            unit            = "A" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "grid_frequency",
-            name            = "Grid frequency",
-            device_class    = "frequency",
-            unit            = "Hz" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "grid_active_power",
-            name            = "Grid active power",
-            device_class    = "power",
-            unit            = "W" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "grid_reactive_power",
-            name            = "Grid reactive power",
-            device_class    = "reactive_power",
-            unit            = "var" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "grid_apparent_power",
-            name            = "Grid apparent power",
-            device_class    = "apparent_power",
-            unit            = "VA" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "backup_frequency",
-            name            = "Backup frequency",
-            device_class    = "frequency",
-            unit            = "Hz" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "backup_active_power",
-            name            = "Backup active power",
-            device_class    = "power",
-            unit            = "W" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "backup_reactive_power",
-            name            = "Backup reactive power",
-            device_class    = "reactive_power",
-            unit            = "var" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "backup_apparent_power",
-            name            = "Backup apparent power",
-            device_class    = "apparent_power",
-            unit            = "VA" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "backup_a_phase_voltage",
-            name            = "Backup A phase voltage",
-            device_class    = "voltage",
-            unit            = "V" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "backup_b_phase_voltage",
-            name            = "Backup B phase voltage",
-            device_class    = "voltage",
-            unit            = "V" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "backup_c_phase_voltage",
-            name            = "Backup C phase voltage",
-            device_class    = "voltage",
-            unit            = "V" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "backup_a_phase_current",
-            name            = "Backup A phase current",
-            device_class    = "current",
-            unit            = "A" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "backup_b_phase_current",
-            name            = "Backup B phase current",
-            device_class    = "current",
-            unit            = "A" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "backup_c_phase_current",
-            name            = "Backup C phase current",
-            device_class    = "current",
-            unit            = "A" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "upper_limit_ongrid_power",
-            name            = "Upper limit of on-grid power",
-            device_class    = "power",
-            unit            = "W" 
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "working_mode",
-            name            = "Inverter working mode",
-        ),
-        SermatecSensor(
-            coordinator     = coordinator,
-            serial_number   = serial_number,
-            dict_key        = "lower_limit_ongrid_soc",
-            name            = "Battery on-grid min. SOC",
-            device_class    = "battery",
-            unit            = "%"
-        ),
+    serial_number = config_entry.data["serial"]
+    
+    available_sensors = smc_api.listSensors(pcuVersion=pcu_version)
+    hass_sensors = []
+    for key, val in available_sensors.items():
+        if "device_class" in val:
+            sensor_device_class = val["device_class"]
+        else:
+            sensor_device_class = None
+        
+        if "unit" in val:
+            sensor_unit = val["unit"]
+        else:
+            sensor_unit = None
+
+        hass_sensors.append(
+            SermatecSensor(
+                coordinator,
+                serial_number,
+                dict_key=key,
+                name=val["name"],
+                device_class=_smc_convert_device_class(sensor_device_class),
+                unit=sensor_unit
+            )
+        )
+
+    # Adding special sensors -- for convenience and usage with Energy dashboard.
+    hass_sensors.extend([
         SermatecPositiveSensor(
             coordinator     = coordinator,
             serial_number   = serial_number,
@@ -379,7 +95,7 @@ async def async_setup_entry(
             name            = "Grid export",
             id              = "grid_export",
             device_class    = "power",
-            unit            = "W"
+            unit            = "W"   
         ),
         SermatecNegativeSensor(
             coordinator     = coordinator,
@@ -393,7 +109,8 @@ async def async_setup_entry(
         SermatecBatteryDischargingPowerSensor(
             coordinator     = coordinator,
             serial_number   = serial_number,
-            dict_key        = {"voltage":"battery_voltage", "current":"battery_current"},
+            dict_power_key  = "dc_power",
+            dict_status_key = "charge_and_discharge_status",
             name            = "Battery discharging power",
             id              = "battery_discharging_power",
             device_class    = "power",
@@ -402,90 +119,26 @@ async def async_setup_entry(
         SermatecBatteryChargingPowerSensor(
             coordinator     = coordinator,
             serial_number   = serial_number,
-            dict_key        = {"voltage":"battery_voltage", "current":"battery_current"},
+            dict_power_key  = "dc_power",
+            dict_status_key = "charge_and_discharge_status",
             name            = "Battery charging power",
             id              = "battery_charging_power",
             device_class    = "power",
             unit            = "W"
         ),
-        SermatecPVTotalPowerSensor(
+        SermatecSumSensor(
             coordinator     = coordinator,
             serial_number   = serial_number,
-            dict_key        = {"pv1":"pv1_power", "pv2":"pv2_power"},
+            dict_key_1      = "pv1_power",
+            dict_key_2      = "pv2_power",
             name            = "PV total power",
             id              = "pv_total_power",
             device_class    = "power",
             unit            = "W"  
         )
-    ]
+    ])
 
-    async_add_entities(sensors, True)
-
-   
-class SermatecCoordinator(DataUpdateCoordinator):
-    """Inverter data coordinator."""
-
-    def __init__(self, hass : HomeAssistant, smc_api : Sermatec):
-        """Coordinator initialization."""
-        super().__init__(
-            hass,
-            _LOGGER,
-            name = "Sermatec",
-            update_interval = timedelta(seconds = 30),
-        )
-        self.smc_api = smc_api
-
-    async def _async_update_data(self):
-        """Fetch data from inverter."""
-
-        retries : int = 3
-        while not await self.smc_api.connect() and retries > 0:
-            await asyncio.sleep(0.5)
-            retries -= 1
-
-        if not self.smc_api.isConnected():
-            raise UpdateFailed(f"Can't connect to the inverter.")
-
-        retries = 3
-        while not (serial := await self.smc_api.getSerial()) and retries > 0:
-            await asyncio.sleep(0.5)
-            retries -= 1
-
-        if not serial:
-            raise UpdateFailed(f"Can't retrieve battery information.")
-
-        retries = 3
-        while not (battery := await self.smc_api.getBatteryInfo()) and retries > 0:
-            await asyncio.sleep(0.5)
-            retries -= 1
-
-        if not battery:
-            raise UpdateFailed(f"Can't retrieve battery information.")
-        
-        retries = 3
-        while not (pvgrid := await self.smc_api.getGridPVInfo()) and retries > 0:
-            await asyncio.sleep(0.5)
-            retries -= 1
-
-        if not pvgrid:
-            raise UpdateFailed(f"Can't retrieve PV/grid information.")
-
-        retries = 3
-        while not (wpams := await self.smc_api.getWorkingParameters()) and retries > 0:
-            await asyncio.sleep(0.5)
-            retries -= 1
-
-        if not wpams:
-            raise UpdateFailed(f"Can't retrieve working parameters.")
-
-        await self.smc_api.disconnect()
-
-        return {
-            "serial": serial,
-            **battery,
-            **pvgrid,
-            **wpams
-        }
+    async_add_entities(hass_sensors, True)
 
 class SermatecSensorBase(CoordinatorEntity, SensorEntity):
     """Standard Sermatec Inverter sensor."""
@@ -522,7 +175,11 @@ class SermatecSensor(SermatecSensorBase):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        self._attr_native_value = self.coordinator.data[self.dict_key]
+        if self.coordinator.data and self.dict_key in self.coordinator.data:
+            self._attr_native_value = self.coordinator.data[self.dict_key]["value"]
+            self._attr_available = True
+        else:
+            self._attr_available = False
         self.async_write_ha_state()
 
 class SermatecSerialSensor(SermatecSensorBase):
@@ -546,8 +203,12 @@ class SermatecPositiveSensor(SermatecSensorBase):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        data = self.coordinator.data[self.dict_key]
-        self._attr_native_value = data if data > 0 else 0
+        if self.coordinator.data and self.dict_key in self.coordinator.data:
+            data = self.coordinator.data[self.dict_key]["value"]
+            self._attr_native_value = data if data > 0 else 0
+            self._attr_available = True
+        else:
+            self._attr_available = False
         self.async_write_ha_state()
 
 class SermatecNegativeSensor(SermatecSensor):
@@ -561,40 +222,12 @@ class SermatecNegativeSensor(SermatecSensor):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        data = self.coordinator.data[self.dict_key]
-        self._attr_native_value = abs(data) if data < 0 else 0
-        self.async_write_ha_state()
-
-class SermatecPositivePowerSensor(SermatecSensor):
-    """
-    Special Sermatec sensor for calculating power from voltage
-    and current and tracking only positive value.
-    """
-
-    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
-        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
-
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle data from the coordinator."""
-        data = self.coordinator.data[self.dict_key["voltage"]] * self.coordinator.data[self.dict_key["current"]]
-        self._attr_native_value = data if data > 0 else 0
-        self.async_write_ha_state()
-
-class SermatecNegativePowerSensor(SermatecSensor):
-    """
-    Special Sermatec sensor for calculating power from voltage
-    and current and tracking only positive value.
-    """
-
-    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
-        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
-
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle data from the coordinator."""
-        data = self.coordinator.data[self.dict_key["voltage"]] * self.coordinator.data[self.dict_key["current"]]
-        self._attr_native_value = abs(data) if data < 0 else 0
+        if self.coordinator.data and self.dict_key in self.coordinator.data:
+            data = self.coordinator.data[self.dict_key]["value"]
+            self._attr_native_value = abs(data) if data < 0 else 0
+            self._attr_available = True
+        else:
+            self._attr_available = False
         self.async_write_ha_state()
 
 class SermatecBatteryChargingPowerSensor(SermatecSensor):
@@ -605,14 +238,20 @@ class SermatecBatteryChargingPowerSensor(SermatecSensor):
     ref: https://community.home-assistant.io/t/howto-fronius-integration-with-battery-into-energy-dashboard/376329
     """
 
-    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
-        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
+    def __init__(self, coordinator, serial_number, dict_power_key, dict_status_key, name, id = None, device_class = None, unit = None):
+        super().__init__(coordinator, serial_number, None, name, id, device_class, unit)
+        self.dict_power_key  = dict_power_key
+        self.dict_status_key = dict_status_key
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        data = self.coordinator.data[self.dict_key["voltage"]] * self.coordinator.data[self.dict_key["current"]] if self.coordinator.data["battery_state"] == "charging" else 0
-        self._attr_native_value = abs(data)
+        if self.coordinator.data and self.dict_power_key in self.coordinator.data and self.dict_status_key in self.coordinator.data:
+            data = self.coordinator.data[self.dict_power_key]["value"] if self.coordinator.data[self.dict_status_key]["value"] == "charging" else 0
+            self._attr_native_value = abs(data)
+            self._attr_available = True
+        else:
+            self._attr_available = False
         self.async_write_ha_state()
 
 class SermatecBatteryDischargingPowerSensor(SermatecSensor):
@@ -623,26 +262,37 @@ class SermatecBatteryDischargingPowerSensor(SermatecSensor):
     ref: https://community.home-assistant.io/t/howto-fronius-integration-with-battery-into-energy-dashboard/376329
     """
 
-    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
-        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
+    def __init__(self, coordinator, serial_number, dict_power_key, dict_status_key, name, id = None, device_class = None, unit = None):
+        super().__init__(coordinator, serial_number, None, name, id, device_class, unit)
+        self.dict_power_key  = dict_power_key
+        self.dict_status_key = dict_status_key
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        data = self.coordinator.data[self.dict_key["voltage"]] * self.coordinator.data[self.dict_key["current"]] if self.coordinator.data["battery_state"] == "discharging" else 0
-        self._attr_native_value = abs(data)
+        if self.coordinator.data and self.dict_power_key in self.coordinator.data and self.dict_status_key in self.coordinator.data:
+            data = self.coordinator.data[self.dict_power_key]["value"] if self.coordinator.data[self.dict_status_key]["value"] == "discharging" else 0
+            self._attr_native_value = abs(data)
+            self._attr_available = True
+        else:
+            self._attr_available = False
         self.async_write_ha_state()
 
-class SermatecPVTotalPowerSensor(SermatecSensor):
+class SermatecSumSensor(SermatecSensor):
     """
     Special Sermatec sensor for calculating total PV power.
     """
-
-    def __init__(self, coordinator, serial_number, dict_key, name, id = None, device_class = None, unit = None):
-        super().__init__(coordinator, serial_number, dict_key, name, id, device_class, unit)
+    def __init__(self, coordinator, serial_number, dict_key_1, dict_key_2, name, id = None, device_class = None, unit = None):
+        super().__init__(coordinator, serial_number, None, name, id, device_class, unit)
+        self.dict_key_1 = dict_key_1
+        self.dict_key_2 = dict_key_2
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle data from the coordinator."""
-        self._attr_native_value = self.coordinator.data[self.dict_key["pv1"]] + self.coordinator.data[self.dict_key["pv2"]]
+        if self.coordinator.data and self.dict_key_1 in self.coordinator.data and self.dict_key_2 in self.coordinator.data:
+            self._attr_native_value = self.coordinator.data[self.dict_key_1]["value"] + self.coordinator.data[self.dict_key_2]["value"]
+            self._attr_available = True
+        else:
+            self._attr_available = False
         self.async_write_ha_state()
