@@ -9,9 +9,8 @@
 
 ### Manual installation
 1. Download integration.
-    - Latest development version can be downloaded from Releases as a zip.
-2. Unzip the downloaded zip file to your `custom_integrations` directory.
-    - The `custom_integrations` is located in your config folder. If the `custom_integrations` folder is not present, create it.
+    - Latest development version can be downloaded [from Releases as a zip](https://github.com/sermatec-opensource/homeassistant-sermatec-inverter/releases/download/latest/sermatec_inverter.zip).
+2. Unzip the downloaded zip file to your Home Assistant configuration directory.
 3. Restart Home Assistant.
 4. In Home Assistant, go to Settings -> Devices & Services -> `+ ADD INTEGRATION` -> search for Sermatec Inverter -> fill in host, port and select language -> click submit.
 5. Done! Now you can see all the sensors in Integrations under Sermatec Inverter.
