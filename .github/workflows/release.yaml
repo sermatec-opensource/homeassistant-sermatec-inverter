@@ -19,7 +19,7 @@ jobs:
       run: sudo apt-get install zip
 
     - name: Zip the integration folder
-      run: zip sermatec_inverter.zip custom_components/sermatec_inverter
+      run: zip -r sermatec_inverter.zip custom_components/sermatec_inverter
 
     - name: Publish the release 
       uses: "marvinpinto/action-automatic-releases@latest"
