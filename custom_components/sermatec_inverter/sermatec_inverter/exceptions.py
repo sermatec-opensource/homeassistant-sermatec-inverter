@@ -18,3 +18,12 @@ class ParsingNotImplemented(BaseException):
 
 class PCUVersionMalformed(BaseException):
     pass
+
+class SendTimeout(BaseException):
+    pass
+
+class RecvTimeout(BaseException):
+    pass
+
+class CommunicationError(BaseException):
+    pass

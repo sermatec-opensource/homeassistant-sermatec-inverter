@@ -428,37 +428,45 @@ class SermatecProtocolParser:
 
         return checksum.to_bytes(1, byteorder="little")
 
-    def checkResponseIntegrity(self, response : bytes, expectedCommandByte : int) -> bool:
-        # Length check.
-        if len(response) < 8: return False
+    def checkResponseIntegrity(self, responses : list[bytes], command : int) -> bool:
 
-        # Signature check.
-        if response[0x00:0x02] != self.REQ_SIGNATURE:
-            logger.debug("Bad response signature.")
+        reponseCommands = self.getResponseCommands(command)
+
+        if len(responses) != len(reponseCommands):
+            logger.debug(f"Invalid count of response packets. Expected {len(response)}, got {len(reponseCommands)}.")
             return False
-        # Sender + receiver check.
-        if response[0x02:0x03] != self.REQ_INVERTER_ADDRESS:
-            logger.debug("Bad response sender address.")
-            return False
-        if response[0x03:0x04] != self.REQ_APP_ADDRESS:
-            logger.debug("Bad response recipient address.")
-            return False
-        # Response command check.
-        if int.from_bytes(response[0x04:0x05], byteorder = "little", signed = False) != expectedCommandByte:
-            logger.debug(f"Bad response expected command. Expected: {expectedCommandByte}, got: {response[0x04:0x05]}.")
-            return False
-        # Zero.
-        if response[0x05] != 0:
-            logger.debug("No zero at response position 0x00.")
-            return False
-        # Checksum verification.
-        if response[-0x02:-0x01] != self.__calculateChecksum(response[:len(response) - 2]):
-            logger.debug(f"Bad response checksum: {response[-0x03:-0x02].hex()}")
-            return False
-        # Footer check.
-        if response[-0x01] != int.from_bytes(self.REQ_FOOTER, byteorder="big"):
-            logger.debug("Bad response footer.")
-            return False
+
+        for response, commandCode in zip(responses, reponseCommands):
+            # Length check.
+            if len(response) < 8: return False
+
+            # Signature check.
+            if response[0x00:0x02] != self.REQ_SIGNATURE:
+                logger.debug("Bad response signature.")
+                return False
+            # Sender + receiver check.
+            if response[0x02:0x03] != self.REQ_INVERTER_ADDRESS:
+                logger.debug("Bad response sender address.")
+                return False
+            if response[0x03:0x04] != self.REQ_APP_ADDRESS:
+                logger.debug("Bad response recipient address.")
+                return False
+            # Response command check.
+            if int.from_bytes(response[0x04:0x05], byteorder = "little", signed = False) != commandCode:
+                logger.debug(f"Bad response expected command. Expected: {commandCode:02x}, got: {response[0x04:0x05].hex()}.")
+                return False
+            # Zero.
+            if response[0x05] != 0:
+                logger.debug("No zero at response position 0x00.")
+                return False
+            # Checksum verification.
+            if response[-0x02:-0x01] != self.__calculateChecksum(response[:len(response) - 2]):
+                logger.debug(f"Bad response checksum: {response[-0x03:-0x02].hex()}")
+                return False
+            # Footer check.
+            if response[-0x01] != int.from_bytes(self.REQ_FOOTER, byteorder="big"):
+                logger.debug("Bad response footer.")
+                return False
 
         return True
 
