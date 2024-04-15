@@ -4,6 +4,22 @@
 
 ![Home Assistant screenshot](assets/hass_integration.png)
 
+## Introduction
+This integration adds support for solar inverters by Chinese manufacturer Shangai Sermatec Energy Technology to the Home Assistant. Currectly the integration supports reading all basic data, including PV, battery and grid status. Entity friendly names language is selectable during integration configuration.
+
+### Supported languages:
+- 🇺🇸 English
+- 🇨🇿 čeština
+- 🇫🇷 Français
+- Missing any language? Check out [this issue](https://github.com/sermatec-opensource/sermatec-inverter/issues/62) and contribute with translations!
+
+### Supported models:
+- `Sermatec SMT-10K-TL-TH`
+- *Probably all residential hybrid inverters by Sermatec should work: all of 5, 6 and 10 kW versions.*
+
+### Supported PCU versions:
+- up to 6.1.9
+
 ## Installation
 **IMPORTANT NOTICE FOR USERS OF OLD VERSIONS**: The new version of the integration is not backwards-compatible. This means you will need to manually remove the device from your Home Assistant and then add again.
 
@@ -19,7 +35,7 @@ Notes:
 - IP is probably assigned dynamically by your router's DHCP server. I recommend setting a static IP (available on most routers), otherwise you would probably need to change the IP in the config once in a while.
 - The default port is `8899`.
 
-#### Using legacy version
+### Using legacy version
 If for some reason you need to use the legacy version which utilized the first version of the communication script, it is still available for downloaded [in Releases](https://github.com/sermatec-opensource/homeassistant-sermatec-inverter/releases/tag/v1.0.1).
 
 ## Tips
@@ -84,11 +100,14 @@ sensor:
 ### Daily, weekly or monthly consumption
 To track consumption per specified time interval you can use [Utility Meter](https://www.home-assistant.io/integrations/utility_meter/).
 
-## Supported devices
-Only tested device is the `Sermatec SMT-10K-TL-TH`. However, probably all residential hybrid inverters by Sermatec should work.
+## Troubleshooting
+If you have trouble with setting up the integration, data retrieval or see some exceptions in the logs, you can open an issue. Please include your inverter model and PCU version if possible.
 
 ## Communication script
 Inverter communication script is in development in [this repository](https://github.com/andreondra/sermatec-inverter), which includes also a detailed documentation.
 
 ## Disclaimer
-Because the protocol used for local communication is reverse-engineered (due to the lack of the official documentation), I am not responsible for any damage that this integration could cause to your inverter or to your house wiring / electrical equipment.
+Because the protocol used for local communication is reverse-engineered (due to the lack of the official documentation), I am not responsible for any damage that this integration could cause to your inverter or to your house wiring / electrical equipment. Use at your own risk.
+
+## Credits
+The project is licensed under the MIT License. (C) Ondrej Golasowski and contributors. Special thanks go to everybody who helped to test and verify this integration or provided any manuals or documentations.
