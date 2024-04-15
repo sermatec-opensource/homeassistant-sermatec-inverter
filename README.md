@@ -100,8 +100,10 @@ sensor:
 ### Daily, weekly or monthly consumption
 To track consumption per specified time interval you can use [Utility Meter](https://www.home-assistant.io/integrations/utility_meter/).
 
-## Troubleshooting
+## Troubleshooting or missing features
 If you have trouble with setting up the integration, data retrieval or see some exceptions in the logs, you can open an issue. Please include your inverter model and PCU version if possible.
+
+If you miss any feature, you may try opening the issue as well. But at first, have a look at other issues or milestones, maybe the feature is already in development.
 
 ## Communication script
 Inverter communication script is in development in [this repository](https://github.com/andreondra/sermatec-inverter), which includes also a detailed documentation.
