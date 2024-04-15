@@ -31,7 +31,24 @@ class Sermatec:
         self.parser = protocol_parser.SermatecProtocolParser(protocolFilePath, lang_file_path)
         self.pcuVersion = 0
     
-    async def __sendQueryAttempt(self, command : int, dataToSend : bytes, responsesCount : int) -> bytes:        
+    async def __sendQueryAttempt(self, command : int, dataToSend : bytes, responsesCount : int) -> list[bytes]:
+        """Send data to inverter, receive a reponse (or responses) and verify integrity.
+        This should not be called anywhere except in __sendQuery.
+
+        Args:
+            command (int): A single-byte code of the command to use.
+            dataToSend (bytes): Data to send.
+            responsesCount (int): How many responses to expect.
+
+        Returns:
+            list[bytes]: List of raw replies. Usually contains one reply -- depends on the command.
+
+        Raises:
+            SendTimeout: If timed out during data sending.
+            RecvTimeout: If no response was delivered in time.
+            ConnectionResetError: If inverter aborted connection.
+            FailedResponseIntegrityCheck: If the response contains errors or unexpected data.
+        """
         responseData : list[bytes] = []
 
         try:
@@ -67,7 +84,21 @@ class Sermatec:
         
         return responseData
 
-    async def __sendQuery(self, command : int) -> bytes:
+    async def __sendQuery(self, command : int) -> list[bytes]:
+        """Send a query to inverter using specified command code using multiple attempts.
+        The connection to the inverter must exist already.
+
+        Args:
+            command (int): A single-byte code of the command to use.
+
+        Returns:
+            list[bytes]: List of raw replies. Usually contains one reply -- depends on the command.
+
+        Raises:
+            ConnectionResetError: If the inverter disconnects.
+            CommunicationError: If the inverter failed to send correct data.
+            NotConnected: If the function is called when no connection to the inverter exist.
+        """
         if self.isConnected():
             dataToSend      = self.parser.generateRequest(command)
             responsesCount  = len(self.parser.getResponseCommands(command))
@@ -83,7 +114,7 @@ class Sermatec:
                     _LOGGER.debug(f"Command 0x{command:02x} data malformed.")
                 except ConnectionResetError:
                     # Connection error is raised immediately.
-                    raise ConnectionError()
+                    raise ConnectionResetError()
                 else:
                     break
 
@@ -117,7 +148,7 @@ class Sermatec:
                 if version == -1:
                     try:
                         version = await self.getPCUVersion()
-                    except (CommunicationError, FailedResponseIntegrityCheck, PCUVersionMalformed):
+                    except (CommunicationError, ConnectionResetError, PCUVersionMalformed):
                         _LOGGER.warning("Can't get PCU version! Using version 0, available parameters will be limited.")
                         self.pcuVersion = 0
                     else:
@@ -189,6 +220,22 @@ class Sermatec:
 # Query methods
 # ========================================================================   
     async def getCustom(self, command : int) -> dict:
+        """Get data from the inverter using specified command code.
+
+        Args:
+            command (int): A single-byte code of the command to use.
+
+        Returns:
+            dict: Parsed reply.
+
+        Raises:
+            ConnectionResetError: If the inverter disconnects.
+            CommunicationError: If the inverter failed to send correct data.
+            NotConnected: If the function is called when no connection to the inverter exist.
+            CommandNotFoundInProtocol: The specified command is not found in the protocol (thus can't be parsed).
+            ProtocolFileMalformed: There was an unexpected error in the protocol file.
+            ParsingNotImplemented: There is a field in command reply which is not supported.
+        """
         responses = await self.__sendQuery(command)
         
         responseCodes = self.parser.getResponseCommands(command)
@@ -203,6 +250,22 @@ class Sermatec:
         return await self.__sendQuery(command)
 
     async def get(self, commandName : str) -> dict:
+        """Get data from the inverter from the specified dataset.
+
+        Args:
+            command (str): A dataset to get data from.
+
+        Returns:
+            dict: Parsed reply.
+
+        Raises:
+            ConnectionResetError: If the inverter disconnects.
+            CommunicationError: If the inverter failed to send correct data.
+            NotConnected: If the function is called when no connection to the inverter exist.
+            CommandNotFoundInProtocol: The specified command is not found in the protocol (thus can't be parsed).
+            ProtocolFileMalformed: There was an unexpected error in the protocol file.
+            ParsingNotImplemented: There is a field in command reply which is not supported.
+        """
         command = self.parser.getCommandCodeFromName(commandName)
         return await self.getCustom(command)
 
