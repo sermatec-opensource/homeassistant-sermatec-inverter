@@ -270,6 +270,20 @@ class Sermatec:
         return await self.getCustom(command)
 
     async def getPCUVersion(self) -> int:
+        """Get inverter's PCU version.
+
+        Returns:
+            int: PCU version.
+
+        Raises:
+            ConnectionResetError: If the inverter disconnects.
+            CommunicationError: If the inverter failed to send correct data.
+            NotConnected: If the function is called when no connection to the inverter exist.
+            CommandNotFoundInProtocol: The specified command is not found in the protocol (thus can't be parsed).
+            ProtocolFileMalformed: There was an unexpected error in the protocol file.
+            ParsingNotImplemented: There is a field in command reply which is not supported.
+            PCUVersionMalformed: The inverter returned invalid PCU version.
+        """
         parsedData : dict = await self.get("systemInformation")
 
         if not "protocol_version_number" in parsedData:
@@ -287,6 +301,19 @@ class Sermatec:
             return version
 
     async def getSerial(self) -> str:
+        """Get inverter's serial number.
+
+        Returns:
+            int: Serial number.
+
+        Raises:
+            ConnectionResetError: If the inverter disconnects.
+            CommunicationError: If the inverter failed to send correct data.
+            NotConnected: If the function is called when no connection to the inverter exist.
+            CommandNotFoundInProtocol: The specified command is not found in the protocol (thus can't be parsed).
+            ProtocolFileMalformed: There was an unexpected error in the protocol file.
+            ParsingNotImplemented: There is a field in command reply which is not supported.
+        """
         parsedData : dict = await self.get("systemInformation")
         serial : str = parsedData["product_sn"]["value"]
         return serial
