@@ -31,62 +31,96 @@ class Sermatec:
         self.parser = protocol_parser.SermatecProtocolParser(protocolFilePath, lang_file_path)
         self.pcuVersion = 0
     
-    async def __sendQuery(self, command : int) -> bytes:
-        if self.isConnected():
-            dataToSend = self.parser.generateRequest(command)
+    async def __sendQueryAttempt(self, command : int, dataToSend : bytes, responsesCount : int) -> list[bytes]:
+        """Send data to inverter, receive a reponse (or responses) and verify integrity.
+        This should not be called anywhere except in __sendQuery.
+
+        Args:
+            command (int): A single-byte code of the command to use.
+            dataToSend (bytes): Data to send.
+            responsesCount (int): How many responses to expect.
+
+        Returns:
+            list[bytes]: List of raw replies. Usually contains one reply -- depends on the command.
+
+        Raises:
+            SendTimeout: If timed out during data sending.
+            RecvTimeout: If no response was delivered in time.
+            ConnectionResetError: If inverter aborted connection.
+            FailedResponseIntegrityCheck: If the response contains errors or unexpected data.
+        """
+        responseData : list[bytes] = []
+
+        try:
             self.writer.write(dataToSend)
+            await asyncio.wait_for(self.writer.drain(), timeout=self.QUERY_WRITE_TIMEOUT)
+        except asyncio.TimeoutError:
+            raise SendTimeout()
+        except ConnectionResetError:
+            _LOGGER.error("Connection reset by the inverter!")
+            self.connected = False
+            raise ConnectionResetError()
+    
+        for _ in range(responsesCount):
+            try:
+                currentResponse = await asyncio.wait_for(self.reader.read(256), timeout=self.QUERY_READ_TIMEOUT)
+            except asyncio.TimeoutError:
+                raise RecvTimeout()
+            except ConnectionResetError:
+                _LOGGER.error("Connection reset by the inverter!")
+                self.connected = False
+                raise ConnectionResetError()
 
-            responseData : list[bytes] = []
-            responsesCount             = len(self.parser.getResponseCommands(command))
+            _LOGGER.debug(f"Received data: { currentResponse.hex(' ', 1) }")
+            responseData.append(currentResponse)
 
+        if len(responseData) != responsesCount:
+            _LOGGER.error(f"Not enough data received when issued command {command}.")
+            self.connected = False
+            raise ConnectionResetError()
+        
+        if not self.parser.checkResponseIntegrity(responseData, command):
+            raise FailedResponseIntegrityCheck()
+        
+        return responseData
+
+    async def __sendQuery(self, command : int) -> list[bytes]:
+        """Send a query to inverter using specified command code using multiple attempts.
+        The connection to the inverter must exist already.
+
+        Args:
+            command (int): A single-byte code of the command to use.
+
+        Returns:
+            list[bytes]: List of raw replies. Usually contains one reply -- depends on the command.
+
+        Raises:
+            ConnectionResetError: If the inverter disconnects.
+            CommunicationError: If the inverter failed to send correct data.
+            NotConnected: If the function is called when no connection to the inverter exist.
+        """
+        if self.isConnected():
+            dataToSend      = self.parser.generateRequest(command)
+            responsesCount  = len(self.parser.getResponseCommands(command))
             for attempt in range(self.QUERY_ATTEMPTS):
-
-                responseData.clear()
-
-                _LOGGER.debug(f"Sending query, attempt {attempt + 1}/{self.QUERY_ATTEMPTS}")
                 try:
-                    await asyncio.wait_for(self.writer.drain(), timeout=self.QUERY_WRITE_TIMEOUT)
-                except asyncio.TimeoutError:
-                    _LOGGER.debug(f"[{attempt + 1}/{self.QUERY_ATTEMPTS}] Timeout when sending request to inverter.")
-                    if attempt + 1 == self.QUERY_ATTEMPTS:
-                        _LOGGER.error(f"Timeout when sending request to inverter after {self.QUERY_ATTEMPTS} tries.")
-                        raise NoDataReceived()
-                    continue
+                    _LOGGER.debug(f"Communicating with inverter, command {command:02x}, attempt {attempt + 1}/{self.QUERY_ATTEMPTS}")
+                    responseData = await self.__sendQueryAttempt(command, dataToSend, responsesCount)
+                except SendTimeout:
+                    _LOGGER.debug(f"Timeout when sending request to inverter, command {command:02x}.")
+                except RecvTimeout:
+                    _LOGGER.debug(f"Timeout when waiting for response from the inverter, command {command:02x}.")
+                except FailedResponseIntegrityCheck:
+                    _LOGGER.debug(f"Command 0x{command:02x} data malformed.")
                 except ConnectionResetError:
-                    _LOGGER.error("Connection reset by the inverter!")
-                    self.connected = False
+                    # Connection error is raised immediately.
                     raise ConnectionResetError()
-            
-                for responseIndex in range(responsesCount):
-                    try:
-                        currentResponse = await asyncio.wait_for(self.reader.read(256), timeout=self.QUERY_READ_TIMEOUT)
-                    except asyncio.TimeoutError:
-                        _LOGGER.debug(f"[{attempt + 1}/{self.QUERY_ATTEMPTS}] Timeout when waiting for response from the inverter.")
-                        if attempt + 1 == self.QUERY_ATTEMPTS:
-                            _LOGGER.error(f"Timeout when waiting for response from the inverter after {self.QUERY_ATTEMPTS} tries.")
-                            raise NoDataReceived()
-                        continue
-                    except ConnectionResetError:
-                        _LOGGER.error("Connection reset by the inverter!")
-                        self.connected = False
-                        raise ConnectionResetError()         
+                else:
+                    break
 
-                    _LOGGER.debug(f"Received data: { currentResponse.hex(' ', 1) }")
-                    responseData.append(currentResponse)
-
-                if len(responseData) != responsesCount:
-                    _LOGGER.error(f"Not enough data received when issued command {command}: connection closed by the inverter.")
-                    self.connected = False
-                    raise ConnectionResetError()
-                
-                for responseIndex in range(responsesCount): 
-                    if not self.parser.checkResponseIntegrity(responseData[responseIndex], command):
-                        _LOGGER.debug(f"[{attempt + 1}/{self.QUERY_ATTEMPTS}] Command 0x{command:02x} response index {responseIndex} data malformed.")
-                        if attempt + 1 == self.QUERY_ATTEMPTS:
-                            _LOGGER.error(f"Got malformed response after {self.QUERY_ATTEMPTS} tries, command 0x{command:02x}, index {responseIndex}.")
-                            raise FailedResponseIntegrityCheck()
-  
-                break
+                if attempt + 1 == self.QUERY_ATTEMPTS:
+                    _LOGGER.error(f"Unable to receive correct response after {attempt + 1} tries.")
+                    raise CommunicationError()
 
             return responseData
                     
@@ -114,7 +148,7 @@ class Sermatec:
                 if version == -1:
                     try:
                         version = await self.getPCUVersion()
-                    except (NoDataReceived, FailedResponseIntegrityCheck, PCUVersionMalformed):
+                    except (CommunicationError, ConnectionResetError, PCUVersionMalformed):
                         _LOGGER.warning("Can't get PCU version! Using version 0, available parameters will be limited.")
                         self.pcuVersion = 0
                     else:
@@ -186,6 +220,22 @@ class Sermatec:
 # Query methods
 # ========================================================================   
     async def getCustom(self, command : int) -> dict:
+        """Get data from the inverter using specified command code.
+
+        Args:
+            command (int): A single-byte code of the command to use.
+
+        Returns:
+            dict: Parsed reply.
+
+        Raises:
+            ConnectionResetError: If the inverter disconnects.
+            CommunicationError: If the inverter failed to send correct data.
+            NotConnected: If the function is called when no connection to the inverter exist.
+            CommandNotFoundInProtocol: The specified command is not found in the protocol (thus can't be parsed).
+            ProtocolFileMalformed: There was an unexpected error in the protocol file.
+            ParsingNotImplemented: There is a field in command reply which is not supported.
+        """
         responses = await self.__sendQuery(command)
         
         responseCodes = self.parser.getResponseCommands(command)
@@ -200,10 +250,40 @@ class Sermatec:
         return await self.__sendQuery(command)
 
     async def get(self, commandName : str) -> dict:
+        """Get data from the inverter from the specified dataset.
+
+        Args:
+            command (str): A dataset to get data from.
+
+        Returns:
+            dict: Parsed reply.
+
+        Raises:
+            ConnectionResetError: If the inverter disconnects.
+            CommunicationError: If the inverter failed to send correct data.
+            NotConnected: If the function is called when no connection to the inverter exist.
+            CommandNotFoundInProtocol: The specified command is not found in the protocol (thus can't be parsed).
+            ProtocolFileMalformed: There was an unexpected error in the protocol file.
+            ParsingNotImplemented: There is a field in command reply which is not supported.
+        """
         command = self.parser.getCommandCodeFromName(commandName)
         return await self.getCustom(command)
 
     async def getPCUVersion(self) -> int:
+        """Get inverter's PCU version.
+
+        Returns:
+            int: PCU version.
+
+        Raises:
+            ConnectionResetError: If the inverter disconnects.
+            CommunicationError: If the inverter failed to send correct data.
+            NotConnected: If the function is called when no connection to the inverter exist.
+            CommandNotFoundInProtocol: The specified command is not found in the protocol (thus can't be parsed).
+            ProtocolFileMalformed: There was an unexpected error in the protocol file.
+            ParsingNotImplemented: There is a field in command reply which is not supported.
+            PCUVersionMalformed: The inverter returned invalid PCU version.
+        """
         parsedData : dict = await self.get("systemInformation")
 
         if not "protocol_version_number" in parsedData:
@@ -221,6 +301,19 @@ class Sermatec:
             return version
 
     async def getSerial(self) -> str:
+        """Get inverter's serial number.
+
+        Returns:
+            int: Serial number.
+
+        Raises:
+            ConnectionResetError: If the inverter disconnects.
+            CommunicationError: If the inverter failed to send correct data.
+            NotConnected: If the function is called when no connection to the inverter exist.
+            CommandNotFoundInProtocol: The specified command is not found in the protocol (thus can't be parsed).
+            ProtocolFileMalformed: There was an unexpected error in the protocol file.
+            ParsingNotImplemented: There is a field in command reply which is not supported.
+        """
         parsedData : dict = await self.get("systemInformation")
         serial : str = parsedData["product_sn"]["value"]
         return serial

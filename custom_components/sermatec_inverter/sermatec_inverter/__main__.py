@@ -47,10 +47,8 @@ async def customgetFunc(**kwargs):
             print("The command was not found in protocol for inverter's version, unable to parse. Try --raw to get raw bytes.")
         except (ProtocolFileMalformed, ParsingNotImplemented):
             print("There was an error parsing the command. Refer to logs.")
-        except (NoDataReceived):
-            print("Inverter sent no data.")
-        except (FailedResponseIntegrityCheck):
-            print("The response was malformed.")
+        except (CommunicationError):
+            print("Error communicating with inverter.")
 
     if data: print(data)
 
@@ -79,10 +77,8 @@ async def getFunc(**kwargs):
         print("The command was not found in protocol for inverter's version, unable to parse. Try --raw to get raw bytes.")
     except (ProtocolFileMalformed, ParsingNotImplemented):
         print("There was an error parsing the command. Refer to logs.")
-    except (NoDataReceived):
-        print("Inverter sent no data.")
-    except (FailedResponseIntegrityCheck):
-        print("The response was malformed.")
+    except (CommunicationError):
+        print("Error communicating with inverter.")
         
     if data: print(data)
 

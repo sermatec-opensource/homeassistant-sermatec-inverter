@@ -11,6 +11,7 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.selector import selector
 
 from .sermatec_inverter import Sermatec
+from .sermatec_inverter.exceptions import *
 
 from .const import DOMAIN
 
@@ -44,8 +45,23 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
 
     if not await smc_api.connect():
         raise CannotConnect
-       
-    if not (serial := await smc_api.getSerial()):
+    
+    try:
+        serial = await smc_api.getSerial()
+    except (ParsingNotImplemented, ProtocolFileMalformed, CommandNotFoundInProtocol):
+        _LOGGER.error("Can't parse serial number. This error should not happen, please contact developer.")
+        await smc_api.disconnect()
+        raise CannotConnect
+    except ConnectionResetError:
+        _LOGGER.error("Inverter reset connnection!")
+        await smc_api.disconnect()
+        raise CannotConnect
+    except CommunicationError:
+        _LOGGER.error("Can't communicate with inverter!")
+        await smc_api.disconnect()
+        raise CannotConnect
+    except NotConnected:
+        _LOGGER.error("No connection to the inverter was made.")
         await smc_api.disconnect()
         raise CannotConnect
 
