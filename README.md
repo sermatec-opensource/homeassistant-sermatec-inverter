@@ -2,7 +2,7 @@
 
 # Sermatec Inverter for Home Assistant
 
-![Home Assistant screenshot](assets/hass_integration.png)
+![Home Assistant screenshot](assets/hass_screenshot.png)
 
 ## Introduction
 This integration adds support for solar inverters by Chinese manufacturer Shangai Sermatec Energy Technology to the Home Assistant. Currectly the integration supports reading all basic data, including PV, battery and grid status. Entity friendly names language is selectable during integration configuration.
