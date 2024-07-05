@@ -1,8 +1,11 @@
 import logging
 import asyncio
+from pathlib import Path
+from collections.abc import Callable
+from typing import Type
+
 from . import protocol_parser
 from .exceptions import *
-from pathlib import Path
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -84,7 +87,7 @@ class Sermatec:
         
         return responseData
 
-    async def __sendQuery(self, command : int) -> list[bytes]:
+    async def __sendQuery(self, command : int, payload : bytes = bytes()) -> list[bytes]:
         """Send a query to inverter using specified command code using multiple attempts.
         The connection to the inverter must exist already.
 
@@ -100,7 +103,7 @@ class Sermatec:
             NotConnected: If the function is called when no connection to the inverter exist.
         """
         if self.isConnected():
-            dataToSend      = self.parser.generateRequest(command)
+            dataToSend      = self.parser.generateRequest(command, payload)
             responsesCount  = len(self.parser.getResponseCommands(command))
             for attempt in range(self.QUERY_ATTEMPTS):
                 try:
@@ -209,6 +212,27 @@ class Sermatec:
                     sensorList.update({key: field})
 
         return sensorList
+    
+    def __listParams(self, paramType : Type[protocol_parser.SermatecProtocolParser.SermatecParameter], pcuVersion : int = None) -> dict:
+        # If no specific pcuVersion specified, use (possibly) previously discovered.
+        if not pcuVersion:
+            pcuVersion = self.pcuVersion
+
+        paramList : dict = {}
+        for name, param in self.parser.SERMATEC_PARAMETERS.items():
+            if isinstance(param, paramType):
+                paramList.update({name:param})
+        
+        return paramList
+
+    def listSwitches(self, pcuVersion : int = None) -> dict:
+        return self.__listParams(self.parser.SermatecSwitchParameter, pcuVersion)
+    
+    def listNumbers(self, pcuVersion : int = None) -> dict:
+        return self.__listParams(self.parser.SermatecNumberParamter, pcuVersion)
+    
+    def listSelects(self, pcuVersion : int = None) -> dict:
+        return self.__listParams(self.parser.SermatecSelectParameter, pcuVersion)
 
     def getQueryCommands(self, pcuVersion : int = None) -> dict:
         # If no specific pcuVersion specified, use (possibly) previously discovered.
@@ -216,6 +240,7 @@ class Sermatec:
             pcuVersion = self.pcuVersion
         
         return self.parser.getQueryCommands(pcuVersion)
+
 # ========================================================================
 # Query methods
 # ========================================================================   
@@ -317,3 +342,65 @@ class Sermatec:
         parsedData : dict = await self.get("systemInformation")
         serial : str = parsedData["product_sn"]["value"]
         return serial
+    
+    async def getParameterData(self) -> dict:
+        parsedResponse = {}
+        for commandCode in self.parser.ALL_PARAMETER_QUERY_COMMANDS:
+            responses      = await self.__sendQuery(commandCode)
+            responseCodes  = self.parser.getResponseCommands(commandCode)
+            for response, responseCode in zip(responses, responseCodes):
+                parsedResponse.update(self.parser.parseParameterReply(responseCode, self.pcuVersion, response))
+            
+        return parsedResponse
+
+# ========================================================================
+# Set methods
+# ========================================================================
+    async def set(self, tag : str, value : bool | int | str, previousData : dict = {}) -> None:
+        """
+
+        Args:
+            
+        Returns:
+            
+        Raises:
+            MissingTaggedData: If not enough data was supplied to build payload.
+            CommandNotFoundInProtocol: The requested command is not available.
+            ParameterNotFound: This parameter is not supported.
+            ValueError: If supplied value is invalid.
+            InverterIsNotOff: If the inverter should be off to set this value.
+        """
+        
+        taggedDataToSend = previousData
+        _LOGGER.debug(f"Provided previous data: {taggedDataToSend}")
+
+        # This may throw ParameterNotFound.    
+        parameterInfo = self.parser.getParameterInfo(tag)
+        
+        convertedValue = parameterInfo.converter.fromFriendly(value)
+        _LOGGER.debug(f"Setting up tag '{tag}' with converted value '{hex(convertedValue)}'")
+
+        if not parameterInfo.validator.validate(convertedValue):
+            raise ValueError
+
+        taggedDataToSend[tag] = int.to_bytes(convertedValue, byteorder="big", signed=False, length = parameterInfo.byteLength)
+
+        if parameterInfo.shouldBeOff:
+            if "onOff" not in previousData:
+                _LOGGER.debug("The inverter should be off to set the value, but no 'onOff' state supplied!")
+                raise MissingTaggedData()
+            elif not self.parser.isInverterOff(previousData["onOff"]):
+                _LOGGER.debug("The inverter has to be off to set this value, but it is on.")
+                raise InverterIsNotOff()
+
+        if parameterInfo.command == 0x66:
+            payload = self.parser.build66Payload(taggedDataToSend)
+        elif parameterInfo.command == 0x64:
+            payload = self.parser.build64Payload(taggedDataToSend)
+        else:
+            raise CommandNotFoundInProtocol
+        
+        _LOGGER.debug(f"Query payload: {payload.hex(' ')}")
+
+        await self.__sendQuery(parameterInfo.command, payload)
+        

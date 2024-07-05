@@ -4,6 +4,10 @@ import re
 from typing import Any, Callable
 from .exceptions import *
 from pathlib import Path
+from enum import Enum, auto
+
+from .converters import *
+from .validators import *
 
 # Local module logger.
 logger = logging.getLogger(__name__)
@@ -20,13 +24,18 @@ class SermatecProtocolParser:
     @staticmethod
     def getResponseCommands(command : int) -> list[int]:
         responseCommands = {
-            0x95: [0x95, 0x9D]
+            # Parameter query commands have two responses.
+            0x95: [0x95, 0x9D],
+
+            # Set commands have no response.
+            0x64: [],
+            0x66: [],
+            0x6A: []
         }
 
         # Usually a single response is returned to a command,
         # hence the default value.
         return responseCommands.get(command, [command])
-
 
     COMMAND_SHORT_NAMES : dict = {
         "systemInformation"   : 0x98,
@@ -42,128 +51,210 @@ class SermatecProtocolParser:
     # Some codes are not meant to be sent, just received via another code.
     ALL_RESPONSE_CODES = [0x98, 0x0a, 0x0b, 0x0c, 0x95, 0x0d, 0x9d]
 
-    def __parseBatteryStatus(self, value : int) -> str:
-        if value == 0x0011:
-            return "charging"
-        elif value == 0x0022:
-            return "discharging"
-        elif value == 0x0033:
-            return "stand-by"
-        else:
-            return "unknown"
+    ALL_PARAMETER_QUERY_COMMANDS = [0x0c, 0x95]
 
-    def __parseOperatingMode(self, value : int) -> str:
-        if value == 0x0001:
-            return "General Mode"
-        elif value == 0x0002:
-            return "Energy Storage Mode"
-        elif value == 0x0003:
-            return "Micro-grid"
-        elif value == 0x0004:
-            return "Peak-Valley"
-        elif value == 0x0005:
-            return "AC Coupling"
-        else:
-            return "unknown"
+    __CONVERTER_BATTERY_STATUS = MapConverter({
+        0x0011 : "charging",
+        0x0022 : "discharging",
+        0x0033 : "stand-by",
+    }, 0x0000, "unknown")
 
-    def __parseBatteryComStatus(self, value : int) -> str:
-        if value == 0x0000:
-            return "OK"
-        elif value == 0x0001:
-            return "Disconnected"
-        else:
-            return "Unknown"
+    __CONVERTER_OPERATING_MODE = MapConverter({
+        0x0001 : "General Mode",
+        0x0002 : "Energy Storage Mode",
+        0x0003 : "Micro-grid",
+        0x0004 : "Peak-Valley",
+        0x0005 : "AC Coupling"
+    }, 0x0000, "unknown")
 
-    def __parseModelCode(self, value : int) -> str:
-        if value == 0x0001:
-            return "10 kW"
-        elif value == 0x0002:
-            return "5 kW"
-        elif value == 0x0003:
-            return "6 kW"
-        elif value == 0x0005:
-            return "3 kW"
+    __CONVERTER_EE_BINARY = MapConverter({
+        0xee00 : True,
+        0x00ee : False
+    }, 0x0000, False)
+
+    # This converter is used for flags represented in protocol as int (instead bits as usual).
+    __CONVERTER_SIMPLE_BINARY = MapConverter({
+        1: True,
+        0: False
+    }, 1, True)
     
-    def __parseBatteryManufacturer(self, value : int) -> str:
-        if value == 1:
-            return "No battery"
-        elif value == 2:
-            return "PylonTech High Voltage Battery"
-        elif value == 3:
-            return "PylonTech Low Voltage Battery"
-        elif value == 9:
-            return "Nelumbo HV Battery"
-        elif value == 12:
-            return "Generic High Voltage Battery"
-        elif value == 13:
-            return "Generic Low Voltage Battery"
-        elif value == 14:
-            return "Dyness High Voltage Battery"
-        elif value == 22:
-            return "BYD High Voltage Battery"
-        elif value == 23:
-            return "BYD Low Voltage Battery"
-        elif value == 25:
-            return "AOBO Battery"
-        elif value == 26:
-            return "Soluna 15K Pack HV"
-        elif value == 27:
-            return "Soluna 4K LV"
-        elif value == 28:
-            return "Soluna 3K LV"
-        elif value == 30:
-            return "Pylon Low Voltage Battery 485"
-        else:
-            return "Unknown"
+    # This converter is used for flags represented in protocol as int but with inverted meaning.
+    __CONVERTER_INVERTED_BINARY = MapConverter({
+        1: False,
+        0: True
+    }, 1, True)
 
-    def __parseBatteryType(self, value : int) -> str:
-        if value == 1:
-            return "Lithium Battery"
-        elif value == 2:
-            return "Lead-acid Battery"
-        else:
-            return "Unknown battery type"
+    # Use only for converting from friendly value to set value in 0x64 command.
+    __CONVERTER_ON_OFF = MapConverter({
+        0x55 : True,
+        0xaa : False
+    }, 0x00, False)
 
-    def __parseMeterProtocol(self, value : int) -> str:
-        if value == 1:
-            return "Not installed"
-        elif value == 2:
-            return "Acrel Three-phase meter"
-        elif value == 3:
-            return "Acrel Single-phase meter"
-        elif value == 4:
-            return "Three-phase Eastron meter"
-        elif value == 5:
-            return "Single-phase Eastron meter"
-        else:
-            return "Unknown meter"
+    __CONVERTER_MODEL_CODE = MapConverter({
+        0x0001: "10 kW",
+        0x0002: "5 kW",
+        0x0003: "6 kW",
+        0x0005: "3 kW"
+    }, 0x0000, "unknown")
 
-    def __parseEEBinarySensor(self, value : int) -> bool:
-        if value == 0xee00:
-            return True
-        else:
-            return False
+    __CONVERTER_BATTERY_MANUFACTURER = MapConverter({
+        1:  "No battery",
+        2:  "PylonTech High Voltage Battery",
+        3:  "PylonTech Low Voltage Battery",
+        4:  "BYD",
+        5:  "Chaowei",
+        6:  "HDXN",
+        7:  "YWLN",
+        9:  "XPGY",
+        10: "WOTAI",
+        11: "RuiPu",
+        12: "Cairi High Voltage",
+        13: "Cairi Low Voltage",
+        14: "Dyness High Voltage",
+        15: "Dyness Low Voltage",
+        16: "DLG Low Voltage",
+        17: "Wotai Low Voltage",
+        18: "SHDL",
+        19: "GuangYu",
+        20: "FeiBo",
+        21: "NJSG",
+        22: "BYD High Voltage",
+        23: "BYD Low Voltage",
+        24: "METERBOOST",
+        25: "AOBO",
+        26: "DLG High Voltage",
+        27: "Soluna Low Voltage",
+        28: "Soluna 3K"
+    }, 0, "unknown")
+
+    __CONVERTER_BATTERY_TYPE = MapConverter({
+        1: "Lithium battery",
+        2: "Lead-acid battery",
+        3: "Flow battery"
+    }, 0, "unknown")
+
+    __CONVERTER_METER_PROTOCOL = MapConverter({
+        1: "Not installed",
+        2: "Acrel Three-phase meter",
+        3: "Acrel Single-phase meter",
+        4: "Eastron Three-phase meter",
+        5: "Eastron Single-phase meter"
+    }, 0, "unknown")
         
-    def __parseProtocolVersion(self, value : int) -> str:
-        return f"{int(value / 100)}.{int((value / 10) % 10)}.{value % 10}"
+    __CONVERTER_AC_OP_STATUS = MapConverter({
+        0: "not running",
+        1: "self-check",
+        2: "standby",
+        3: "on-grid",
+        4: "off-grid",
+        5: "backup mode"
+    }, 0, "unknown")
 
-    # Enquoting the SermatecProtocolParser type because it is a forward declaration (PEP 484).
-    FIELD_PARSERS : dict[str, Callable[["SermatecProtocolParser", Any], Any]] = {
-        "batteryStatus" : __parseBatteryStatus,
-        "operatingMode" : __parseOperatingMode,
+    __CONVERTER_AC_OP_MODE = MapConverter({
+        1: "MPPT mode",
+        2: "Constant current mode",
+        3: "PV constant voltage mode",
+        4: "AC rectification mode",
+        5: "Secondary constant current mode",
+        6: "Constant DC power mode",
+        7: "Constant AC power mode",
+        0: "unknown mode"
+    }, 0, "unknown mode")
+
+    # Using original name from name tag in protocol.json, not translated/converted one!
+    NAME_BASED_FIELD_PARSERS : dict[str, BaseConverter] = {
+        "Charge and discharge status" : __CONVERTER_BATTERY_STATUS,
+        "Operating mode" : __CONVERTER_OPERATING_MODE,
+        "model code": __CONVERTER_MODEL_CODE,
+        "Battery manufacturer number (code list)": __CONVERTER_BATTERY_MANUFACTURER,
+        "Battery communication protocol selection": __CONVERTER_BATTERY_MANUFACTURER,
+        "DC side battery type": __CONVERTER_BATTERY_TYPE,
+        "Meter communication protocol selection": __CONVERTER_METER_PROTOCOL,
+        "Three-phase unbalanced output": __CONVERTER_EE_BINARY,
+        "Meter detection function": __CONVERTER_EE_BINARY,
+        "battery warning": __CONVERTER_SIMPLE_BINARY,
+        "battery error": __CONVERTER_SIMPLE_BINARY,
+        "Battery communication connection status": __CONVERTER_INVERTED_BINARY,
+        "AC side operation mode": __CONVERTER_AC_OP_STATUS,
+        "AC side running status": __CONVERTER_AC_OP_MODE
     }
 
-    NAME_BASED_FIELD_PARSERS : dict[str, Callable[["SermatecProtocolParser", Any], Any]] = {
-        "battery_communication_connection_status" : __parseBatteryComStatus,
-        "model_code": __parseModelCode,
-        "battery_manufacturer_number__code_list_": __parseBatteryManufacturer,
-        "battery_communication_protocol_selection": __parseBatteryManufacturer,
-        "dc_side_battery_type": __parseBatteryType,
-        "meter_communication_protocol_selection": __parseMeterProtocol,
-        "meter_detection_function": __parseEEBinarySensor,
-        "three_phase_unbalanced_output": __parseEEBinarySensor
+
+    class SermatecParameter:      
+        def __init__(self, command : int, byteLength : int, converter : BaseConverter, validator : BaseValidator, friendlyType : type, shouldBeOff : bool):
+            # Parameter friendlyType is used to signalize in what type the friendly value is expected, useful mainly for terminal UI,
+            # where everything is passed as string by default
+            self.command        = command
+            self.byteLength     = byteLength
+            self.converter      = converter
+            self.validator      = validator
+            self.friendlyType   = friendlyType
+            self.shouldBeOff    = shouldBeOff
+
+    class SermatecSwitchParameter(SermatecParameter):
+        def __init__(self, command : int, byteLength : int, converter : BaseConverter, validator : BaseValidator, friendlyType : type, shouldBeOff : bool):
+            super().__init__(command, byteLength, converter, validator, friendlyType, shouldBeOff)
+
+    class SermatecSelectParameter(SermatecParameter):
+        def __init__(self, command : int, byteLength : int, converter : BaseConverter, validator : BaseValidator, friendlyType : type, shouldBeOff : bool):
+            super().__init__(command, byteLength, converter, validator, friendlyType, shouldBeOff)
+
+    class SermatecNumberParamter(SermatecParameter):
+        def __init__(self, command : int, byteLength : int, converter : BaseConverter, validator : BaseValidator, friendlyType : type, shouldBeOff : bool, min : int, max : int):
+            super().__init__(command, byteLength, converter, validator, friendlyType, shouldBeOff)
+            self.min = min
+            self.max = max
+
+    SERMATEC_PARAMETERS = {
+        "onOff" : SermatecSwitchParameter(
+            command      = 0x64,
+            byteLength   = 1,
+            converter    = __CONVERTER_ON_OFF,
+            validator    = EnumValidator([0x55, 0xaa]),
+            friendlyType = int,
+            shouldBeOff  = False
+        ),
+        "operatingMode" : SermatecSelectParameter(
+            command      = 0x66,
+            byteLength   = 2,
+            converter    = __CONVERTER_OPERATING_MODE,
+            validator    = EnumValidator([0x1, 0x2, 0x3, 0x4, 0x5]),
+            friendlyType = str,
+            shouldBeOff  = False,
+        ),
+        "antiBackflow" : SermatecSwitchParameter(
+            command      = 0x66,
+            byteLength   = 2,
+            converter    = __CONVERTER_EE_BINARY,
+            validator    = EnumValidator([0xee00, 0x00ee]),
+            friendlyType = int,
+            shouldBeOff  = True,
+        ),
+        "soc": SermatecNumberParamter(
+            command      = 0x66,
+            byteLength   = 2,
+            converter    = DummyConverter(),
+            validator    = IntRangeValidator(10, 100),
+            friendlyType = int,
+            shouldBeOff  = False,
+            min          = 10,
+            max          = 100
+        )
     }
 
+    def getParameterInfo(self,parameterTag : str) -> SermatecParameter:
+        """Get information about parameter by tag.
+
+        Returns:
+            SermatecParameter: Parameter information.
+
+        Raises:
+            ParameterNotFound: Parameter was not found.
+        """
+        if not parameterTag in self.SERMATEC_PARAMETERS:
+            raise ParameterNotFound()
+        else:
+            return self.SERMATEC_PARAMETERS[parameterTag]
 
     def __init__(self, protocolPath : str, languageFilePath : Path):
         with open(protocolPath, "r") as protocolFile:
@@ -235,7 +326,100 @@ class SermatecProtocolParser:
             return len(str(multiplier).split(".")[1])
         else:
             return 0
+
+    def parseParameterReply(self, command : int, version : int, reply : bytes) -> dict:
+        """Parse a command reply, leaving raw values and using tag as keys. Usable mainly
+           for parameter setting.
+
+        Args:
+            command (int): A single-byte code of the command to parse.
+            version (int): A PCU version (used to look up a correct response format).
+            reply (bytes): A reply to parse.
+
+        Returns:
+            dict: Parsed reply.
+
+        Raises:
+            CommandNotFoundInProtocol: The specified command is not found in the protocol (thus can't be parsed).
+            ProtocolFileMalformed: There was an unexpected error in the protocol file.
+            ParsingNotImplemented: There is a field in command reply which is not supported.
+        """           
+        logger.debug(f"Reply to parse: {reply[self.REPLY_OFFSET_DATA:].hex(' ')}")
         
+        logger.debug("Looking for the command in protocol.")
+        # This may throw CommandNotFoundInProtocol.
+        cmd : dict = self.__getCommandByVersion(command, version)
+
+        try:
+            cmdType     : dict = cmd["type"]
+            cmdName     : dict = cmd["comment"]
+            cmdFields   : dict = cmd["fields"]
+        except KeyError:
+            logger.error(f"Protocol file malformed, can't process command 0x'{command:02x}'")
+            raise ProtocolFileMalformed()
+        
+        logger.debug(f"It is command 0x{cmdType}: {cmdName} with {len(cmdFields)} fields")
+
+        parsedData : dict       = {}
+        replyPosition : int     = self.REPLY_OFFSET_DATA
+        prevReplyPosition : int = 0
+
+        for idx, field in enumerate(cmdFields):
+            ignoreField = False
+
+            if ("same" in field and field["same"]):
+                logger.debug(f"Staying at the same byte.")
+                replyPosition = prevReplyPosition
+
+            logger.debug(f"== Field #{idx} (reply byte #{replyPosition})")
+
+            if not (("name" or "byteLen" or "type") in field):
+                logger.error(f"Field has a 'name', 'byteLen' or 'type' missing: {field}.")
+                raise ProtocolFileMalformed()
+
+            fieldLength = int(field["byteLen"])
+            if fieldLength < 1:
+                logger.error("Field length is zero or negative.")
+                raise ProtocolFileMalformed()
+
+            fieldType = field["type"]                           
+            rawFieldData = reply[ replyPosition : (replyPosition + fieldLength) ]
+
+            # This is used only for the onOff tag. Others are integers.
+            if fieldType == "bit":
+                if "bitPosition" in field:
+                    fieldBitPosition = field["bitPosition"]
+                else:
+                    logger.error("Field is of a type 'bit', but is missing key 'bitPosition'.")
+                    raise ProtocolFileMalformed()
+                convertedBytes = int.from_bytes(rawFieldData, byteorder = "big", signed = False)
+                extractedBit   = bool(convertedBytes & (1 << fieldBitPosition))
+                
+                if "tag" in field and field["tag"] == "onOff":
+                    logger.debug("Detected type bit, tag onOff. Converting.")
+                    rawFieldData = self.__CONVERTER_ON_OFF.fromFriendly(extractedBit).to_bytes(byteorder = "big", signed = False)
+                
+            logger.debug(f"Storing raw field data: {rawFieldData}")
+
+            # Fields with "repeat" are not supported for now, skipping.
+            if "repeat" in field:
+                fieldLength *= int(field["repeat"])
+                ignoreField = True
+                logger.debug("Fields with 'repeat' are not supported, skipping...")
+
+            # Skipping reserved fields.
+            if fieldType == "preserve":
+                ignoreField = True
+                logger.debug("Skipping unused value (type preserved)...")
+
+            if not ignoreField and "tag" in field:
+                parsedData[field["tag"]] =  rawFieldData
+                logger.debug(f"Stored data to tag {field["tag"]}.")
+
+            prevReplyPosition = replyPosition
+            replyPosition += fieldLength
+        
+        return parsedData
 
     def parseReply(self, command : int, version : int, reply : bytes, dryrun : bool = False) -> dict:
         """Parse a command reply using a specified version definition.
@@ -373,11 +557,15 @@ class SermatecProtocolParser:
                     trimmedString = currentFieldData.split(b"\x00", 1)[0]
                     newField["value"] = trimmedString.decode('ascii')
                 elif fieldType == "bit":
-                    binString : str = bin(int.from_bytes(currentFieldData, byteorder = "little", signed = False)).removeprefix("0b")
-                    newField["value"] = bool(binString[fieldBitPosition])
+                    convertedBytes = int.from_bytes(currentFieldData, byteorder = "big", signed = False)                    
+                    newField["value"] = bool(convertedBytes & (1 << fieldBitPosition))
                 elif fieldType == "bitRange":
-                    binString : str = bin(int.from_bytes(currentFieldData, byteorder = "little", signed = False)).removeprefix("0b")
-                    newField["value"] = binString[fieldFromBit:fieldEndBit]
+                    convertedBytes = int.from_bytes(currentFieldData, byteorder = "big", signed = False)
+                    binLength = fieldEndBit - fieldFromBit
+                    binaryMask = (1 << (binLength)) - 1
+                    convertedBytes = (convertedBytes >> fieldFromBit) & binaryMask
+                    logger.debug(f"Masked value: {convertedBytes}")
+                    newField["value"] = convertedBytes
                 elif fieldType == "hex":
                     newField["value"] =  int.from_bytes(currentFieldData, byteorder = "big", signed = False)
                 elif fieldType == "preserve":
@@ -388,15 +576,11 @@ class SermatecProtocolParser:
                     ignoreField = True
                     logger.info(f"The provided field is of an unsuported type '{fieldType}'.")
 
-                # Some field have a meaning encoded to integers: trying to parse.
-                if "parser" in field and field["parser"] in self.FIELD_PARSERS:
-                    logger.debug("This field has an explicit parser available, parsing.")
-                    newField["value"] = self.FIELD_PARSERS[field["parser"]](self, newField["value"])
-
-                # On some fields the parse key is missing, so using names for identification.
-                if fieldTag in self.NAME_BASED_FIELD_PARSERS:
+                # Some field have a meaning encoded: trying to parse.
+                # Using names for identification.
+                if field["name"] in self.NAME_BASED_FIELD_PARSERS:
                     logger.debug("This field has an name-based parser available, parsing.")
-                    newField["value"] = self.NAME_BASED_FIELD_PARSERS[fieldTag](self, newField["value"])
+                    newField["value"] = self.NAME_BASED_FIELD_PARSERS[field["name"]].toFriendly(newField["value"])
 
             # Fields with "repeat" are not supported for now, skipping.
             if "repeat" in field:
@@ -470,14 +654,73 @@ class SermatecProtocolParser:
 
         return True
 
-    def generateRequest(self, command : int) -> bytes:  
-        request : bytearray = bytearray([*self.REQ_SIGNATURE, *self.REQ_APP_ADDRESS, *self.REQ_INVERTER_ADDRESS, command, 0x00, 0x00])
+    def generateRequest(self, command : int, payload : bytes = bytes()) -> bytes:
+        request : bytearray = bytearray([*self.REQ_SIGNATURE, *self.REQ_APP_ADDRESS, *self.REQ_INVERTER_ADDRESS, command, 0x00, len(payload)]) + payload
         request += self.__calculateChecksum(request)
         request += self.REQ_FOOTER
 
         logger.debug(f"Built command: {[hex(x) for x in request]}")
 
         return request
+
+    def build66Payload(self, taggedData : dict) -> bytes:
+        """Generate 0x66 command payload from specified data.
+
+        Args:
+            taggedData (dict): Data to build payload from.
+
+        Returns:
+            bytes: Payload.
+
+        Raises:
+            MissingTaggedData: If not enough data was supplied to build payload.
+        """      
+        payload = bytearray();
+
+        try:
+            payload.extend(taggedData["price1"])
+            payload.extend(taggedData["price2"])
+            payload.extend(taggedData["price3"])
+            payload.extend(taggedData["price4"])
+            payload.extend(taggedData["con"])
+            payload.extend(taggedData["chargePower"])
+            payload.extend(taggedData["operatingMode"])
+            payload.extend(taggedData["gridSwitch"])
+            payload.extend(taggedData["adjustMethod"])
+            payload.extend(taggedData["antiBackflow"])
+            payload.extend(taggedData["batteryCharge"])
+            payload.extend(taggedData["soc"])
+            # Zeroes for "How many sets of data are there" field.
+            payload.extend(b'\x00\x00')
+        except KeyError:
+            raise MissingTaggedData()
+        
+        return payload
+        
+    def build64Payload(self, taggedData : dict) -> bytes:
+        """Generate 0x64 command payload from specified data.
+
+        Args:
+            taggedData (dict): Data to build payload from.
+
+        Returns:
+            bytes: Payload.
+
+        Raises:
+            MissingTaggedData: If not enough data was supplied to build payload.
+        """      
+        payload = bytearray();
+
+        try:
+            payload.extend(taggedData["onOff"])
+        except KeyError:
+            raise MissingTaggedData()
+        
+        return payload
+    
+    def isInverterOff(self, value : bytes) -> bool:
+        """Check whether the provided value corresponds to off state."""
+        return value == bytes([0xaa])
 
 if __name__ == "__main__":
     logging.basicConfig(level = "DEBUG")

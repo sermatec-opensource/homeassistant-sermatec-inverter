@@ -87,7 +87,48 @@ async def getFunc(**kwargs):
     print("OK")
 
 async def setFunc(**kwargs):
-    pass
+    smc = Sermatec(kwargs["ip"], kwargs["port"], kwargs["protocolFilePath"])
+    print(f"Connecting to Sermatec at {kwargs['ip']}:{kwargs['port']}...", end = "")
+    if await smc.connect():
+        print("OK")
+    else:
+        print("Can't connect.")
+        return
+
+    try:
+        convertedValue = smc.parser.SERMATEC_PARAMETERS[kwargs["tag"]].friendlyType(kwargs["value"])
+    except ValueError:
+        print("Supplied value is not valid.")
+        print("Disconnecting...", end = "")
+        await smc.disconnect()
+        print("OK")
+        return
+
+    try:
+        print("Contacting inverter...")
+        data = await smc.getParameterData()
+        print("Setting data...")
+        await smc.set(kwargs["tag"], convertedValue, data)
+    except CommandNotFoundInProtocol:
+        print("The command was not found in protocol for inverter's version, unable to parse. Try --raw to get raw bytes.")
+    except (ProtocolFileMalformed, ParsingNotImplemented):
+        print("There was an error parsing the command. Refer to logs.")
+    except (CommunicationError):
+        print("Error communicating with inverter.")
+    except (MissingTaggedData):
+        print("Not enough data available to configure inverter -- contact developer.")
+    except (ParameterNotFound):
+        print("This parameter is not supported.")
+    except (ValueError):
+        print("Supplied value is not valid.")
+    except (InverterIsNotOff):
+        print("Inverter has to be turned off to set this value! Please turn off the inverter.")
+    else:
+        print("OK!")
+
+    print("Disconnecting...", end = "")
+    await smc.disconnect()
+    print("OK")
 
 async def listFunc(**kwargs):
     smc = Sermatec(kwargs["ip"], kwargs["port"], kwargs["protocolFilePath"])
@@ -130,6 +171,16 @@ if __name__ == "__main__":
 
     setParser = subparsers.add_parser("set", help = "Configure a value in the inverter.")
     setParser.set_defaults(cmdFunc = setFunc)
+    setParser.add_argument(
+        "tag",
+        help = "Tag of configured value.",
+        choices = SermatecProtocolParser.SERMATEC_PARAMETERS.keys()
+    )
+    setParser.add_argument(
+        "value",
+        help = "Value to set.",
+        type = str
+    )
 
     listParser = subparsers.add_parser("list", help = "List supported sensors and other features.")
     listParser.set_defaults(cmdFunc = listFunc)

@@ -153,19 +153,25 @@
                 "order": 12,
                 "byteLen": 2,
                 "type": "uInt",
-                "name": "battery warning"
+                "name": "battery warning",
+                "unitType": "binary",
+                "deviceClass": "PROBLEM"
               },
               {
                 "order": 13,
                 "byteLen": 2,
                 "type": "uInt",
-                "name": "battery error"
+                "name": "battery error",
+                "unitType": "binary",
+                "deviceClass": "PROBLEM"
               },
               {
                 "order": 14,
                 "byteLen": 2,
                 "type": "uInt",
-                "name": "Battery communication connection status"
+                "name": "Battery communication connection status",
+                "unitType": "binary",
+                "deviceClass": "CONNECTIVITY"
               }
             ]
           },
@@ -372,7 +378,7 @@
                 "type": "int",
                 "name": "grid reactive power",
                 "unitValue": "1",
-                "unitType": "W"
+                "unitType": "var"
               },
               {
                 "order": 25,
@@ -380,7 +386,7 @@
                 "type": "int",
                 "name": "grid apparent power",
                 "unitValue": "1",
-                "unitType": "var"
+                "unitType": "VA"
               },
               {
                 "order": 26,
@@ -597,7 +603,7 @@
                 "type": "int",
                 "name": "backup active power",
                 "unitValue": "1",
-                "unitType": "VA"
+                "unitType": "W"
               },
               {
                 "order": 54,
@@ -613,7 +619,7 @@
                 "type": "int",
                 "name": "backup apparent power",
                 "unitValue": "1",
-                "unitType": "W"
+                "unitType": "VA"
               }
             ]
           },
@@ -627,7 +633,7 @@
                 "byteLen": 2,
                 "type": "bit",
                 "name": "grid power down",
-                "deviceClass": "POWER",
+                "deviceClass": "PROBLEM",
                 "bitPosition": 14
               },
               {
@@ -679,8 +685,7 @@
                 "name": "AC side running status",
                 "same": true,
                 "fromBit": 5,
-                "endBit": 8,
-                "listIgnore": true
+                "endBit": 8
               },
               {
                 "order": 7,
@@ -697,14 +702,14 @@
                 "name": "AC side operation mode",
                 "same": true,
                 "fromBit": 1,
-                "endBit": 4,
-                "listIgnore": true
+                "endBit": 4
               },
               {
                 "order": 9,
                 "byteLen": 2,
                 "type": "bit",
                 "name": "inverter switched on",
+                "deviceClass": "RUNNING",
                 "tag": "onOff",
                 "same": true,
                 "bitPosition": 0
@@ -925,7 +930,7 @@
                 "order": 6,
                 "byteLen": 2,
                 "type": "int",
-                "tag": "style",
+                "tag": "operatingMode",
                 "name": "Operating mode",
                 "validate": "enum(0,1,2,3,4,5,6)"
               },
@@ -949,7 +954,7 @@
                 "order": 9,
                 "byteLen": 2,
                 "type": "hex",
-                "tag": "refluxs",
+                "tag": "antiBackflow",
                 "name": "anti-backflow function",
                 "converter": "map(1:ee00, 2:00ee, default:0000)",
                 "validate": "enumStr(ee00,00ee,0000)",
@@ -1451,7 +1456,7 @@
                 "order": 6,
                 "byteLen": 2,
                 "type": "int",
-                "tag": "style",
+                "tag": "operatingMode",
                 "name": "Operating mode",
                 "parser": "operatingMode"
               },
@@ -1473,7 +1478,7 @@
                 "order": 9,
                 "byteLen": 2,
                 "type": "hex",
-                "tag": "refluxs",
+                "tag": "antiBackflow",
                 "converter": "map(ee00:1, 00ee:2, default:0)",
                 "name": "anti-backflow function",
                 "unitType": "binary"
@@ -1754,7 +1759,7 @@
                 "order": 6,
                 "byteLen": 2,
                 "type": "int",
-                "tag": "style",
+                "tag": "operatingMode",
                 "name": "Operating mode",
                 "validate": "enum(0,1,2,3,4,5,6)"
               },
@@ -1778,7 +1783,7 @@
                 "order": 9,
                 "byteLen": 2,
                 "type": "hex",
-                "tag": "refluxs",
+                "tag": "antiBackflow",
                 "name": "anti-backflow function",
                 "converter": "map(1:ee00, 2:00ee, default:0000)",
                 "validate": "enumStr(ee00,00ee,0000)",
@@ -2134,7 +2139,7 @@
                 "order": 6,
                 "byteLen": 2,
                 "type": "int",
-                "tag": "style",
+                "tag": "operatingMode",
                 "name": "Operating mode",
                 "parser": "operatingMode"
               },
@@ -2156,7 +2161,7 @@
                 "order": 9,
                 "byteLen": 2,
                 "type": "hex",
-                "tag": "refluxs",
+                "tag": "antiBackflow",
                 "converter": "map(ee00:1, 00ee:2, default:0)",
                 "name": "anti-backflow function",
                 "unitType": "binary"
@@ -2455,7 +2460,7 @@
                 "order": 6,
                 "byteLen": 2,
                 "type": "int",
-                "tag": "style",
+                "tag": "operatingMode",
                 "name": "Operating mode",
                 "parser": "operatingMode"
               },
@@ -2477,7 +2482,7 @@
                 "order": 9,
                 "byteLen": 2,
                 "type": "hex",
-                "tag": "refluxs",
+                "tag": "antiBackflow",
                 "converter": "map(ee00:1, 00ee:2, default:0)",
                 "name": "anti-backflow function",
                 "unitType": "binary"
@@ -2855,7 +2860,8 @@
                 "byteLen": 2,
                 "type": "int",
                 "tag": "parallelFlag",
-                "name": "Single parallel machine sign"
+                "name": "Single parallel machine sign",
+                "listIgnore": true
               },
               {
                 "order": 21,
@@ -3630,7 +3636,8 @@
                 "byteLen": 2,
                 "type": "int",
                 "tag": "parallelFlag",
-                "name": "Single parallel machine sign"
+                "name": "Single parallel machine sign",
+                "listIgnore": true
               },
               {
                 "order": 21,
@@ -3852,7 +3859,7 @@
                 "type": "int",
                 "name": "grid reactive power",
                 "unitValue": "1",
-                "unitType": "W"
+                "unitType": "var"
               },
               {
                 "order": 25,
@@ -3860,7 +3867,7 @@
                 "type": "int",
                 "name": "grid apparent power",
                 "unitValue": "1",
-                "unitType": "var"
+                "unitType": "VA"
               },
               {
                 "order": 26,
@@ -4513,7 +4520,8 @@
                 "byteLen": 2,
                 "type": "int",
                 "tag": "parallelFlag",
-                "name": "Single parallel machine sign"
+                "name": "Single parallel machine sign",
+                "listIgnore": true
               },
               {
                 "order": 21,
@@ -4705,7 +4713,8 @@
                 "byteLen": 2,
                 "type": "int",
                 "tag": "parallelFlag",
-                "name": "Single parallel machine sign"
+                "name": "Single parallel machine sign",
+                "listIgnore": true
               },
               {
                 "order": 21,

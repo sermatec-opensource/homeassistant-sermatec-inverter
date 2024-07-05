@@ -27,3 +27,15 @@ class RecvTimeout(BaseException):
 
 class CommunicationError(BaseException):
     pass
+
+class DuplicateMapValue(BaseException):
+    pass
+
+class ParameterNotFound(BaseException):
+    pass
+
+class MissingTaggedData(BaseException):
+    pass
+
+class InverterIsNotOff(BaseException):
+    pass
