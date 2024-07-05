@@ -11,6 +11,7 @@ This integration adds support for solar inverters by Chinese manufacturer Shanga
 - 🇺🇸 English
 - 🇨🇿 čeština
 - 🇫🇷 Français
+- <span dir="ltr"> اَلْعَرَبِيَّةُ </span>
 - Missing any language? Check out [this issue](https://github.com/sermatec-opensource/sermatec-inverter/issues/62) and contribute with translations!
 
 ### Supported models:
