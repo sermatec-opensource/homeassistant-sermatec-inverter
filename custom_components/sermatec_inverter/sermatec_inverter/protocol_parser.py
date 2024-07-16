@@ -176,15 +176,18 @@ class SermatecProtocolParser:
         "battery error": __CONVERTER_SIMPLE_BINARY,
         "Battery communication connection status": __CONVERTER_INVERTED_BINARY,
         "AC side operation mode": __CONVERTER_AC_OP_STATUS,
-        "AC side running status": __CONVERTER_AC_OP_MODE
+        "AC side running status": __CONVERTER_AC_OP_MODE,
+        "anti-backflow function": __CONVERTER_EE_BINARY
     }
 
 
     class SermatecParameter:      
-        def __init__(self, command : int, byteLength : int, converter : BaseConverter, validator : BaseValidator, friendlyType : type, shouldBeOff : bool):
+        def __init__(self, command : int, name : str, statusTag : str, byteLength : int, converter : BaseConverter, validator : BaseValidator, friendlyType : type, shouldBeOff : bool):
             # Parameter friendlyType is used to signalize in what type the friendly value is expected, useful mainly for terminal UI,
             # where everything is passed as string by default
             self.command        = command
+            self.name           = name
+            self.statusTag      = statusTag
             self.byteLength     = byteLength
             self.converter      = converter
             self.validator      = validator
@@ -192,22 +195,24 @@ class SermatecProtocolParser:
             self.shouldBeOff    = shouldBeOff
 
     class SermatecSwitchParameter(SermatecParameter):
-        def __init__(self, command : int, byteLength : int, converter : BaseConverter, validator : BaseValidator, friendlyType : type, shouldBeOff : bool):
-            super().__init__(command, byteLength, converter, validator, friendlyType, shouldBeOff)
+        def __init__(self, command : int, name : str, statusTag : str, byteLength : int, converter : BaseConverter, validator : BaseValidator, friendlyType : type, shouldBeOff : bool):
+            super().__init__(command, name, statusTag, byteLength, converter, validator, friendlyType, shouldBeOff)
 
     class SermatecSelectParameter(SermatecParameter):
-        def __init__(self, command : int, byteLength : int, converter : BaseConverter, validator : BaseValidator, friendlyType : type, shouldBeOff : bool):
-            super().__init__(command, byteLength, converter, validator, friendlyType, shouldBeOff)
+        def __init__(self, command : int, name : str, statusTag : str, byteLength : int, converter : BaseConverter, validator : BaseValidator, friendlyType : type, shouldBeOff : bool):
+            super().__init__(command, name, statusTag, byteLength, converter, validator, friendlyType, shouldBeOff)
 
     class SermatecNumberParamter(SermatecParameter):
-        def __init__(self, command : int, byteLength : int, converter : BaseConverter, validator : BaseValidator, friendlyType : type, shouldBeOff : bool, min : int, max : int):
-            super().__init__(command, byteLength, converter, validator, friendlyType, shouldBeOff)
+        def __init__(self, command : int, name : str, statusTag : str, byteLength : int, converter : BaseConverter, validator : BaseValidator, friendlyType : type, shouldBeOff : bool, min : int, max : int):
+            super().__init__(command, name, statusTag, byteLength, converter, validator, friendlyType, shouldBeOff)
             self.min = min
             self.max = max
 
     SERMATEC_PARAMETERS = {
         "onOff" : SermatecSwitchParameter(
             command      = 0x64,
+            name         = "Power",
+            statusTag    = "inverter_switched_on",
             byteLength   = 1,
             converter    = __CONVERTER_ON_OFF,
             validator    = EnumValidator([0x55, 0xaa]),
@@ -216,6 +221,8 @@ class SermatecProtocolParser:
         ),
         "operatingMode" : SermatecSelectParameter(
             command      = 0x66,
+            name         = "Operating Mode",
+            statusTag    = "operating_mode",
             byteLength   = 2,
             converter    = __CONVERTER_OPERATING_MODE,
             validator    = EnumValidator([0x1, 0x2, 0x3, 0x4, 0x5]),
@@ -224,6 +231,8 @@ class SermatecProtocolParser:
         ),
         "antiBackflow" : SermatecSwitchParameter(
             command      = 0x66,
+            name         = "Backflow protection",
+            statusTag    = "anti_backflow_function",
             byteLength   = 2,
             converter    = __CONVERTER_EE_BINARY,
             validator    = EnumValidator([0xee00, 0x00ee]),
@@ -232,6 +241,8 @@ class SermatecProtocolParser:
         ),
         "soc": SermatecNumberParamter(
             command      = 0x66,
+            name         = "Battery SOC lower limit (on-grid)",
+            statusTag    = "grid_connected_soc_lower_limit_setting",
             byteLength   = 2,
             converter    = DummyConverter(),
             validator    = IntRangeValidator(10, 100),
