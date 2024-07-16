@@ -17,5 +17,19 @@
                 }
             }
         }
+    },
+    "exceptions": {
+        "param_connection_error": {
+          "message": "Nelze nastavit parametr: chyba připojení k měniči!"
+        },
+        "param_no_data_error": {
+            "message": "Nelze nastavit parametr: měnič nezaslal data!"
+        },
+        "param_set_error": {
+            "message": "Nelze nastavit parametr: nelze poslat data měniči!"
+        },
+        "inverter_not_off": {
+            "message": "Nelze nastavit parametr: měnič musí být vypnut pro nastavení tohoto parametru!"
+        }
     }
 }

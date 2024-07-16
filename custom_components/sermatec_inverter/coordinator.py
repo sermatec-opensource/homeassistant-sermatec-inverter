@@ -67,6 +67,18 @@ class SermatecCoordinator(DataUpdateCoordinator):
             else:
                 coordinator_data.update(response)
 
+        try:
+            response = await self.smc_api.getParameterData()
+        except CommunicationError:
+            pass
+        except (NotConnected, ConnectionResetError):
+            await asyncio.sleep(5)
+            await self.smc_api.connect(version=self.pcuVersion)
+        except (CommandNotFoundInProtocol, ProtocolFileMalformed, ParsingNotImplemented):
+            _LOGGER.error("Specified command cannot be parsed. This error should not happen, please contact developer.")
+        else:
+            coordinator_data["parameter_data"] = response
+            
         await self.smc_api.disconnect()
 
         if not coordinator_data:

@@ -17,5 +17,19 @@
                 }
             }
         }
+    },
+    "exceptions": {
+        "param_connection_error": {
+          "message": "Erreur de paramétrage: impossible de se connecter à l'onduleur!"
+        },
+        "param_no_data_error": {
+            "message": "Erreur de paramétrage: l'onduleur n'a retourné aucune donnée."
+        },
+        "param_set_error": {
+            "message": "Erreur de paramétrage: impossible d'envoyer des données à l'onduleur."
+        },
+        "inverter_not_off": {
+            "message": "Erreur: l'onduleur doit être éteint pour changer ce paramètre!"
+        }
     }
 }
