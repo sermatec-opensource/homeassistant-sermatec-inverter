@@ -85,17 +85,17 @@ class SermatecNumber(CoordinatorEntity, NumberEntity):
         """Set new value."""
         """Turn the entity off."""
         if not "parameter_data" in self.coordinator.data:
-            raise HomeAssistantError(translation_domain=DOMAIN, translation_key = "switch_no_data_error") 
+            raise HomeAssistantError(translation_domain=DOMAIN, translation_key = "param_no_data_error") 
         
         if not await self.coordinator.smc_api.connect(version=self.coordinator.pcuVersion) or not self.coordinator.smc_api.isConnected():
-            raise HomeAssistantError(translation_domain=DOMAIN, translation_key = "switch_connection_error")
+            raise HomeAssistantError(translation_domain=DOMAIN, translation_key = "param_connection_error")
         
         try:
             # WARNING, TODO: here I always convert to int. This is because no configurable float
             # parameters exists as of now, but this would need to be changed if there will be any.
             await self.coordinator.smc_api.set(self._tag, int(value), self.coordinator.data["parameter_data"])
         except (CommandNotFoundInProtocol, ProtocolFileMalformed, ParsingNotImplemented, CommunicationError, MissingTaggedData, ParameterNotFound, ValueError):
-            raise HomeAssistantError(translation_domain=DOMAIN, translation_key = "switch_set_error")
+            raise HomeAssistantError(translation_domain=DOMAIN, translation_key = "param_set_error")
         except InverterIsNotOff:
             raise HomeAssistantError(translation_domain=DOMAIN, translation_key = "inverter_not_off")
         
