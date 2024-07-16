@@ -20,16 +20,16 @@
     },
     "exceptions": {
         "param_connection_error": {
-          "message": "Error setting parameter: can't connect to the inverter!"
+          "message": "Erreur de paramétrage: impossible de se connecter à l'onduleur!"
         },
         "param_no_data_error": {
-            "message": "Error setting parameter: inverter didn't provide data."
+            "message": "Erreur de paramétrage: l'onduleur n'a retourné aucune donnée."
         },
         "param_set_error": {
-            "message": "Error setting parameter: can't send data to inverter."
+            "message": "Erreur de paramétrage: impossible d'envoyer des données à l'onduleur."
         },
         "inverter_not_off": {
-            "message": "Error: inverter has to be turned off to set this parameter!"
+            "message": "Erreur: l'onduleur doit être éteint pour changer ce paramètre!"
         }
     }
 }
