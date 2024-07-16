@@ -39,7 +39,12 @@ Notes:
 ### Using legacy version
 If for some reason you need to use the legacy version which utilized the first version of the communication script, it is still available for downloaded [in Releases](https://github.com/sermatec-opensource/homeassistant-sermatec-inverter/releases/tag/v1.0.1).
 
-## Tips
+## Usage & Tips
+### Setting parameters (using switches, selects...)
+- When setting parameters using this integration (for example turning the inverter off using the switch), there will be slight delay until the parameter updates. For example: if you turn off the inverter, the switch may stay on for up to 1 minute until new data are fetched from the inverter -- this is expected and not an error. This is caused by the communication protocol itself and is unavoidable for now.
+- Parameters can't be set immediately after the integration is loaded. Please wait for about 1 minute -- initialization data need to be loaded from the inverter.
+- Some paramaters require that the inverter is turned off before setting the parameter (e.g. the backflow protection function). Before setting these parameters, use the "Power" switch to turn the inverter off. Full list of these parameters can be found in the comm script repo [here](https://github.com/sermatec-opensource/sermatec-inverter).
+
 ### Calculating total energy
 To use this integration with Energy Dashboard or to calculate energy usage/import/export etc. you need to use the [Riemann sum integration](https://www.home-assistant.io/integrations/integration/). You can use a new GUI setup in a Helpers category (which is recommended), or an old yaml config method, example is below. Do not forget to set:
 - metric prefix (unit_prefix) to `k` and integration time (unit_time) to `h` (hours) to get values in `kWh` - important to be able to use these in the Energy dashboard!
