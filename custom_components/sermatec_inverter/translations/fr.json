@@ -19,17 +19,17 @@
         }
     },
     "exceptions": {
-        "switch_connection_error": {
-          "message": "Error toggling switch: can't connect to the inverter!"
+        "param_connection_error": {
+          "message": "Error setting parameter: can't connect to the inverter!"
         },
-        "switch_no_data_error": {
-            "message": "Error toggling switch: inverter didn't provide data."
+        "param_no_data_error": {
+            "message": "Error setting parameter: inverter didn't provide data."
         },
-        "switch_set_error": {
-            "message": "Error toggling switch: can't send data to inverter."
+        "param_set_error": {
+            "message": "Error setting parameter: can't send data to inverter."
         },
         "inverter_not_off": {
-            "message": "Error toggling switch: inverter has to be turned off to set this parameter!"
+            "message": "Error: inverter has to be turned off to set this parameter!"
         }
-      }
+    }
 }

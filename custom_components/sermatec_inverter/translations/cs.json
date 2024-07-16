@@ -19,17 +19,17 @@
         }
     },
     "exceptions": {
-        "switch_connection_error": {
-          "message": "Nelze nastavit parametetr: chyba připojení k měniči!"
+        "param_connection_error": {
+          "message": "Nelze nastavit parametr: chyba připojení k měniči!"
         },
-        "switch_no_data_error": {
-            "message": "Nelze nastavit parametetr: měnič nezaslal data!"
+        "param_no_data_error": {
+            "message": "Nelze nastavit parametr: měnič nezaslal data!"
         },
-        "switch_set_error": {
-            "message": "Nelze nastavit parametetr: nelze poslat data měniči!"
+        "param_set_error": {
+            "message": "Nelze nastavit parametr: nelze poslat data měniči!"
         },
         "inverter_not_off": {
-            "message": "Nelze nastavit parametetr: měnič musí být vypnut pro nastavení tohoto parametru!"
+            "message": "Nelze nastavit parametr: měnič musí být vypnut pro nastavení tohoto parametru!"
         }
-      }
+    }
 }

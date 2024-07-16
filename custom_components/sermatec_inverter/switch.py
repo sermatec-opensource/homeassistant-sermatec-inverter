@@ -81,15 +81,15 @@ class SermatecSwitch(CoordinatorEntity, SwitchEntity):
     async def _set_switch(self, state : bool) -> None:
         """Turn the entity off."""
         if not "parameter_data" in self.coordinator.data:
-            raise HomeAssistantError(translation_domain=DOMAIN, translation_key = "switch_no_data_error") 
+            raise HomeAssistantError(translation_domain=DOMAIN, translation_key = "param_no_data_error") 
         
         if not await self.coordinator.smc_api.connect(version=self.coordinator.pcuVersion) or not self.coordinator.smc_api.isConnected():
-            raise HomeAssistantError(translation_domain=DOMAIN, translation_key = "switch_connection_error")
+            raise HomeAssistantError(translation_domain=DOMAIN, translation_key = "param_connection_error")
         
         try:
             await self.coordinator.smc_api.set(self._tag, state, self.coordinator.data["parameter_data"])
         except (CommandNotFoundInProtocol, ProtocolFileMalformed, ParsingNotImplemented, CommunicationError, MissingTaggedData, ParameterNotFound, ValueError):
-            raise HomeAssistantError(translation_domain=DOMAIN, translation_key = "switch_set_error")
+            raise HomeAssistantError(translation_domain=DOMAIN, translation_key = "param_set_error")
         except InverterIsNotOff:
             raise HomeAssistantError(translation_domain=DOMAIN, translation_key = "inverter_not_off")
         
