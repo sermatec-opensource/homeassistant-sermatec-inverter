@@ -12,6 +12,9 @@ class BaseConverter():
     def fromFriendly(self, value) -> int: # type: ignore
         pass
 
+    def listFriendly(self) -> list:
+        pass
+
 class MapConverter(BaseConverter):
     """Convert to and from friendly names using map.
     """
@@ -49,6 +52,9 @@ class MapConverter(BaseConverter):
         else:
             return self.__inv_map[value]
         
+    def listFriendly(self) -> list:
+        return list(self.__map.values())
+        
 class DummyConverter(BaseConverter):
     """This converter passes through the value without conversion."""
     def __init__(self):
@@ -59,3 +65,6 @@ class DummyConverter(BaseConverter):
     
     def fromFriendly(self, value):
         return value
+    
+    def listFriendly(self) -> list:
+        return []
