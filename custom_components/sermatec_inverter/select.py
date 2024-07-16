@@ -55,8 +55,11 @@ class SermatecSelect(CoordinatorEntity, SelectEntity):
         self._attr_name             = select_parameter.name
         self._attr_options          = select_parameter.converter.listFriendly()
 
-        self._attr_available        = False
+        # This line is needed for HA to not throw AttributeError.
         self._attr_current_option   = None
+        # This line is needed to make sure the entity is unavailable until it is updated
+        # from the None state set above by the coordinator.
+        self._attr_available        = False
         
 
     @property
