@@ -14,7 +14,7 @@ from .const import DOMAIN
 from .coordinator import SermatecCoordinator
 from .sermatec_inverter import Sermatec
 
-PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.SWITCH, Platform.BINARY_SENSOR]
+PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.SWITCH, Platform.BINARY_SENSOR, Platform.NUMBER]
 _LOGGER = logging.getLogger(__name__)
 
 # Name space preparation.
