@@ -3,7 +3,7 @@ from typing import Any
 
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -67,19 +67,19 @@ class SermatecSwitch(CoordinatorEntity, SwitchEntity):
             "manufacturer": "Sermatec",
             "model": "Residential Hybrid Inverter 5-10 kW"
         }
-    
-    @property
-    def is_on(self):
-        """Return true if the switch is on."""
+           
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle data from the coordinator."""
         if self.coordinator.data and self._switch_parameter.statusTag in self.coordinator.data:
             self._attr_available = True
-            return self.coordinator.data[self._switch_parameter.statusTag]["value"] == 1
+            self._attr_is_on = self.coordinator.data[self._switch_parameter.statusTag]["value"] == 1
         else:
-            self._attr_available = True
-            return False
+            self._attr_available = False
+        self.async_write_ha_state()
+
     
     async def _set_switch(self, state : bool) -> None:
-        """Turn the entity off."""
         if not "parameter_data" in self.coordinator.data:
             raise HomeAssistantError(translation_domain=DOMAIN, translation_key = "param_no_data_error") 
         
