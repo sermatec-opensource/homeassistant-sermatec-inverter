@@ -80,7 +80,6 @@ class SermatecNumber(CoordinatorEntity, NumberEntity):
 
     async def async_set_native_value(self, value: float) -> None:
         """Set new value."""
-        """Turn the entity off."""
         if not "parameter_data" in self.coordinator.data:
             raise HomeAssistantError(translation_domain=DOMAIN, translation_key = "param_no_data_error") 
         
