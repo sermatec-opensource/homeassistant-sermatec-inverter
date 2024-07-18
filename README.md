@@ -115,7 +115,7 @@ If you miss any feature, you may try opening the issue as well. But at first, ha
 Inverter communication script is in development in [this repository](https://github.com/andreondra/sermatec-inverter), which includes also a detailed documentation.
 
 ## Disclaimer
-Because the protocol used for local communication is reverse-engineered (due to the lack of the official documentation), I am not responsible for any damage that this integration could cause to your inverter or to your house wiring / electrical equipment. Use at your own risk.
+Because the protocol used for local communication is reverse-engineered (due to the lack of the official documentation), I am not responsible for any damage that this integration could cause to your inverter or to your house wiring / electrical equipment. Use at your own risk. You can also lose warranty, some distributors are known to not like using unofficial ways of interfacing with the inverter.
 
 ## Credits
 The project is licensed under the MIT License. (C) Ondrej Golasowski and contributors. Special thanks go to everybody who helped to test and verify this integration or provided any manuals or documentations.
