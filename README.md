@@ -22,7 +22,7 @@ This integration adds support for solar inverters by Chinese manufacturer Shanga
 - all versions, newest tested is 6.1.9
 
 ## Installation
-**IMPORTANT NOTICE FOR USERS OF OLD VERSIONS**: The new version of the integration is not backwards-compatible. This means you will need to manually remove the device from your Home Assistant and then add again.
+**IMPORTANT NOTICE FOR USERS OF LEGACY VERSIONS (pre v2.0.0)**: The new version of the integration is not backwards-compatible. This means you will need to manually remove the device from your Home Assistant and then add again.
 
 ### Manual installation
 1. Download integration.
