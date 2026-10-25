@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from functools import partial
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -29,10 +30,9 @@ async def async_setup(hass: HomeAssistant, config: dict):
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up sermatec from a config entry."""
     
-    smc_api = Sermatec(
-        entry.data['host'],
-        entry.data['port'],
-        language=entry.data["language"]
+    # The constructor reads the protocol and translation files; keep the file I/O off the event loop.
+    smc_api = await hass.async_add_executor_job(
+        partial(Sermatec, entry.data['host'], entry.data['port'], language=entry.data["language"])
     )
 
     _LOGGER.info("Getting inverter version...")

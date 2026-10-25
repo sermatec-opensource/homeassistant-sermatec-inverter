@@ -38,10 +38,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     Data has the keys from STEP_USER_DATA_SCHEMA with values provided by the user.
     """
 
-    smc_api : Sermatec = Sermatec(
-        data["host"],
-        data["port"]
-    )
+    smc_api : Sermatec = await hass.async_add_executor_job(Sermatec, data["host"], data["port"])
 
     if not await smc_api.connect():
         raise CannotConnect
